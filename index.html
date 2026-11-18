@@ -1,0 +1,2943 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estoque Inteligente</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   ESTOQUE INTELIGENTE - CSS
+   Paleta: Azul escuro / Branco / Cinza
+   Fonte: Poppins
+   ========================================================= */
+:root{
+  --azul-900:#0b1e3f;
+  --azul-800:#102a55;
+  --azul-700:#16366b;
+  --azul-600:#1e4a8f;
+  --azul-500:#2a5fb3;
+  --azul-100:#e6edf8;
+  --branco:#ffffff;
+  --cinza-50:#f7f8fa;
+  --cinza-100:#eef0f3;
+  --cinza-200:#dfe3e9;
+  --cinza-300:#c4cad4;
+  --cinza-400:#9aa3b1;
+  --cinza-500:#6b7280;
+  --cinza-600:#4b5563;
+  --cinza-700:#374151;
+  --vermelho:#ef4444;
+  --verde:#22c55e;
+  --amarelo:#f5a623;
+  --sombra:0 2px 8px rgba(11,30,63,.08);
+  --sombra-forte:0 6px 20px rgba(11,30,63,.15);
+  --radius:10px;
+  --radius-sm:6px;
+  --transicao:.2s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Poppins',sans-serif;
+  background:var(--cinza-50);
+  color:var(--cinza-700);
+  font-size:14px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{color:var(--azul-900);font-weight:600}
+h1{font-size:1.6rem}
+h2{font-size:1.3rem;margin-bottom:14px}
+h3{font-size:1.1rem;margin-bottom:10px}
+h4{font-size:.95rem;margin-bottom:8px}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,select,textarea{font-family:inherit;font-size:.9rem}
+a{color:inherit;text-decoration:none}
+
+/* ===================== LOGIN ===================== */
+.login-screen {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, var(--azul-900) 0%, var(--azul-700) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+}
+.login-card {
+  background: var(--branco);
+  border-radius: var(--radius);
+  box-shadow: var(--sombra-forte);
+  padding: 40px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  animation: fadeIn .3s ease;
+}
+.login-logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  background: var(--azul-900);
+  color: var(--branco);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin: 0 auto 16px;
+}
+.login-title {
+  font-size: 1.5rem;
+  color: var(--azul-900);
+  margin-bottom: 4px;
+}
+.login-subtitle {
+  color: var(--cinza-500);
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+}
+.password-wrapper {
+  position: relative;
+}
+.password-wrapper .form-control {
+  padding-right: 40px;
+}
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--cinza-500);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: color var(--transicao);
+}
+.password-toggle:hover {
+  color: var(--azul-700);
+}
+.forgot-password {
+  display: block;
+  text-align: right;
+  font-size: 0.8rem;
+  color: var(--azul-600);
+  margin-top: 8px;
+  cursor: pointer;
+  transition: color var(--transicao);
+}
+.forgot-password:hover {
+  color: var(--azul-800);
+  text-decoration: underline;
+}
+.login-error {
+  color: var(--vermelho);
+  font-size: 0.85rem;
+  margin-top: 16px;
+  display: none;
+  background: #fee2e2;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+}
+
+/* ===================== LAYOUT ===================== */
+.app{display:flex;min-height:100vh}
+.sidebar{
+  width:240px;
+  background:linear-gradient(180deg,var(--azul-900) 0%,var(--azul-800) 100%);
+  color:var(--branco);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;
+  z-index:100;
+  transition:transform var(--transicao);
+}
+.sidebar-header{
+  padding:20px 18px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;gap:10px;
+}
+.sidebar-header .logo{
+  width:36px;height:36px;border-radius:8px;
+  background:var(--branco);color:var(--azul-900);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:1.1rem;
+}
+.sidebar-header h1{color:var(--branco);font-size:1rem;font-weight:600;line-height:1.2}
+.sidebar-header small{color:var(--cinza-300);font-size:.7rem;font-weight:400}
+.sidebar-nav{flex:1;overflow-y:auto;padding:12px 0}
+.nav-group{margin-bottom:8px}
+.nav-group-title{
+  padding:8px 20px;
+  font-size:.7rem;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--cinza-400);
+  font-weight:500;
+}
+.nav-item{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 20px;
+  color:var(--cinza-200);
+  font-size:.88rem;
+  font-weight:400;
+  cursor:pointer;
+  border-left:3px solid transparent;
+  transition:all var(--transicao);
+}
+.nav-item:hover{background:rgba(255,255,255,.05);color:var(--branco)}
+.nav-item.active{
+  background:rgba(255,255,255,.08);
+  color:var(--branco);
+  border-left-color:var(--branco);
+  font-weight:500;
+}
+.nav-item svg{width:18px;height:18px;flex-shrink:0}
+
+.main{flex:1;margin-left:240px;display:flex;flex-direction:column;min-width:0}
+.topbar{
+  height:60px;
+  background:var(--branco);
+  border-bottom:1px solid var(--cinza-200);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:var(--sombra);
+}
+.topbar-left{display:flex;align-items:center;gap:14px}
+.topbar-title{font-weight:600;color:var(--azul-900);font-size:1.05rem}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.btn-menu{
+  display:none;
+  width:40px;height:40px;border-radius:8px;
+  align-items:center;justify-content:center;
+  color:var(--azul-900);
+}
+.btn-menu:hover{background:var(--cinza-100)}
+.btn-menu svg{width:22px;height:22px}
+
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 14px;
+  border-radius:var(--radius-sm);
+  font-size:.85rem;font-weight:500;
+  transition:all var(--transicao);
+  border:1px solid transparent;
+  white-space:nowrap;
+}
+.btn svg{width:16px;height:16px}
+.btn-primary{background:var(--azul-700);color:var(--branco)}
+.btn-primary:hover{background:var(--azul-600)}
+.btn-secondary{background:var(--cinza-100);color:var(--azul-900);border-color:var(--cinza-200)}
+.btn-secondary:hover{background:var(--cinza-200)}
+.btn-danger{background:var(--vermelho);color:var(--branco)}
+.btn-danger:hover{background:#dc2626}
+.btn-success{background:var(--verde);color:var(--branco)}
+.btn-success:hover{background:#16a34a}
+.btn-ghost{color:var(--cinza-600)}
+.btn-ghost:hover{background:var(--cinza-100)}
+.btn-sm{padding:5px 10px;font-size:.78rem}
+.btn-icon{padding:8px;width:36px;height:36px;justify-content:center}
+
+/* ===================== ALERT BAR ===================== */
+.alert-bar{
+  background:var(--azul-100);
+  color:var(--azul-900);
+  padding:10px 20px;
+  font-size:.82rem;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border-bottom:1px solid var(--cinza-200);
+  line-height:1.4;
+}
+.alert-bar svg{
+  width:18px;height:18px;flex-shrink:0;color:var(--azul-700);
+}
+.alert-bar strong{font-weight:600}
+
+.content{flex:1;padding:20px;overflow-x:hidden}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ===================== CARDS ===================== */
+.card{
+  background:var(--branco);
+  border-radius:var(--radius);
+  box-shadow:var(--sombra);
+  padding:20px;
+  margin-bottom:16px;
+}
+.card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;flex-wrap:wrap;gap:10px;
+}
+.card-title{font-size:1.05rem;font-weight:600;color:var(--azul-900)}
+
+/* ===================== FORMS ===================== */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+.form-group.span-2{grid-column:span 2}
+.form-label{font-size:.78rem;font-weight:500;color:var(--cinza-600)}
+.form-label .req{color:var(--vermelho)}
+.form-control{
+  padding:9px 12px;
+  border:1px solid var(--cinza-300);
+  border-radius:var(--radius-sm);
+  background:var(--branco);
+  color:var(--cinza-700);
+  transition:border-color var(--transicao),box-shadow var(--transicao);
+  width:100%;
+}
+.form-control:focus{
+  outline:none;
+  border-color:var(--azul-500);
+  box-shadow:0 0 0 3px rgba(42,95,179,.15);
+}
+textarea.form-control{resize:vertical;min-height:80px}
+.form-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+
+/* ===================== SEARCH ===================== */
+.search-bar{
+  display:flex;align-items:center;gap:8px;
+  background:var(--cinza-50);
+  border:1px solid var(--cinza-200);
+  border-radius:var(--radius-sm);
+  padding:6px 10px;
+  flex:1;max-width:360px;
+}
+.search-bar svg{width:16px;height:16px;color:var(--cinza-400);flex-shrink:0}
+.search-bar input{
+  border:none;background:transparent;outline:none;
+  flex:1;font-size:.88rem;color:var(--cinza-700);
+}
+
+/* ===================== TABLE ===================== */
+.table-wrap{overflow-x:auto;margin-top:10px;border-radius:var(--radius-sm);border:1px solid var(--cinza-200)}
+table{width:100%;border-collapse:collapse;background:var(--branco);font-size:.85rem}
+thead{background:var(--azul-900);color:var(--branco)}
+th{
+  text-align:left;padding:11px 14px;font-weight:500;
+  font-size:.78rem;text-transform:uppercase;letter-spacing:.03em;
+}
+td{padding:11px 14px;border-top:1px solid var(--cinza-100);color:var(--cinza-700)}
+tbody tr:hover{background:var(--cinza-50)}
+tbody tr.empty td{text-align:center;color:var(--cinza-400);padding:24px;font-style:italic}
+.row-actions{display:flex;gap:6px}
+.row-actions button{
+  width:30px;height:30px;border-radius:6px;
+  display:inline-flex;align-items:center;justify-content:center;
+  color:var(--cinza-600);
+  transition:all var(--transicao);
+}
+.row-actions button:hover{background:var(--cinza-100);color:var(--azul-700)}
+.row-actions button.delete:hover{background:#fde8e6;color:var(--vermelho)}
+.row-actions svg{width:15px;height:15px}
+
+.badge{
+  display:inline-block;padding:3px 9px;border-radius:12px;
+  font-size:.72rem;font-weight:500;
+}
+.badge-success{background:#dcfce7;color:var(--verde)}
+.badge-danger{background:#fee2e2;color:var(--vermelho)}
+.badge-warning{background:#fef4e0;color:#a06900}
+.badge-info{background:var(--azul-100);color:var(--azul-700)}
+
+/* ===================== MODAL ===================== */
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(11,30,63,.5);
+  display:none;align-items:center;justify-content:center;
+  z-index:1000;padding:16px;
+  animation:fadeIn .2s ease;
+}
+.modal-backdrop.active{display:flex}
+.modal{
+  background:var(--branco);border-radius:var(--radius);
+  max-width:520px;width:100%;max-height:90vh;overflow-y:auto;
+  box-shadow:var(--sombra-forte);
+}
+.modal-header{
+  padding:16px 20px;border-bottom:1px solid var(--cinza-100);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.modal-header h3{margin:0;font-size:1.05rem}
+.modal-body{padding:20px}
+.modal-footer{
+  padding:14px 20px;border-top:1px solid var(--cinza-100);
+  display:flex;justify-content:flex-end;gap:8px;
+}
+.modal-close{
+  width:32px;height:32px;border-radius:6px;
+  display:inline-flex;align-items:center;justify-content:center;
+  color:var(--cinza-500);
+}
+.modal-close:hover{background:var(--cinza-100)}
+
+/* ===================== PHOTO ===================== */
+.photo-upload{
+  display:flex;align-items:center;gap:14px;
+  padding:10px;border:1px dashed var(--cinza-300);
+  border-radius:var(--radius-sm);background:var(--cinza-50);
+}
+.photo-preview{
+  width:70px;height:70px;border-radius:8px;
+  background:var(--cinza-100);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;flex-shrink:0;
+  color:var(--cinza-400);
+}
+.photo-preview img{width:100%;height:100%;object-fit:cover}
+.photo-preview svg{width:28px;height:28px}
+.photo-actions{display:flex;flex-direction:column;gap:6px}
+
+/* ===================== DASHBOARD ===================== */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:18px}
+.kpi-card{
+  background:var(--branco);border-radius:var(--radius);
+  padding:18px;box-shadow:var(--sombra);
+  border-left:4px solid var(--azul-600);
+}
+.kpi-card .kpi-label{font-size:.75rem;color:var(--cinza-500);text-transform:uppercase;letter-spacing:.04em;font-weight:500}
+.kpi-card .kpi-value{font-size:1.5rem;font-weight:600;color:var(--azul-900);margin-top:6px}
+.kpi-card .kpi-sub{font-size:.78rem;color:var(--cinza-500);margin-top:4px}
+
+.chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+.chart-card{
+  background:var(--branco);border-radius:var(--radius);
+  padding:18px;box-shadow:var(--sombra);
+}
+.chart-card h4{margin-bottom:12px;color:var(--azul-900)}
+.chart-container{position:relative;width:100%;min-height:240px}
+.chart-container svg{width:100%;height:auto;display:block}
+
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:.78rem}
+.legend-item{display:flex;align-items:center;gap:6px;color:var(--cinza-600)}
+.legend-dot{width:10px;height:10px;border-radius:2px}
+
+/* ===================== FILTERS ===================== */
+.filters{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px;padding:14px;background:var(--cinza-50);
+  border-radius:var(--radius-sm);margin-bottom:14px;
+}
+
+/* ===================== TOAST ===================== */
+.toast-container{position:fixed;top:74px;right:20px;z-index:2000;display:flex;flex-direction:column;gap:8px}
+.toast{
+  background:var(--branco);border-left:4px solid var(--azul-600);
+  padding:12px 16px;border-radius:var(--radius-sm);
+  box-shadow:var(--sombra-forte);
+  min-width:260px;max-width:380px;
+  font-size:.85rem;color:var(--cinza-700);
+  animation:slideIn .25s ease;
+}
+.toast.success{border-left-color:var(--verde)}
+.toast.error{border-left-color:var(--vermelho)}
+.toast.warning{border-left-color:var(--amarelo)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:none;opacity:1}}
+
+/* ===================== RESPONSIVE ===================== */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:90}
+.overlay.active{display:block}
+
+@media (max-width:960px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .btn-menu{display:inline-flex}
+  .topbar-title{font-size:.95rem}
+}
+@media (max-width:600px){
+  .content{padding:14px}
+  .card{padding:14px}
+  .topbar{padding:0 12px}
+  .topbar-right .btn span{display:none}
+  .topbar-right .btn{padding:8px}
+  h1{font-size:1.3rem}
+  h2{font-size:1.1rem}
+  .kpi-card .kpi-value{font-size:1.25rem}
+  th,td{padding:9px 10px;font-size:.78rem}
+  .form-group.span-2{grid-column:1/-1}
+  .alert-bar{padding:10px 12px;font-size:.78rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== LOGIN SCREEN ===================== -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">EI</div>
+    <h2 class="login-title">Estoque Inteligente</h2>
+    <p class="login-subtitle">Faça login para acessar o sistema</p>
+    <form id="loginForm">
+      <div class="form-group" style="margin-bottom: 16px; text-align: left;">
+        <label class="form-label">Usuário</label>
+        <input type="text" class="form-control" id="loginUser" required autocomplete="username">
+      </div>
+      <div class="form-group" style="margin-bottom: 16px; text-align: left;">
+        <label class="form-label">Senha</label>
+        <div class="password-wrapper">
+          <input type="password" class="form-control" id="loginPass" required autocomplete="current-password">
+          <button type="button" class="password-toggle" id="togglePassword" title="Mostrar/Ocultar senha">
+            <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg id="eyeOffIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
+        <a class="forgot-password" id="btnForgotPassword">Esqueci minha senha</a>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;">
+        Entrar
+      </button>
+      <div class="login-error" id="loginError">Usuário ou senha incorretos.</div>
+    </form>
+  </div>
+</div>
+
+<div class="app">
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">EI</div>
+      <div>
+        <h1>Estoque Inteligente</h1>
+        <small>Controle de Estoque</small>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-title">Cadastro</div>
+        <div class="nav-item" data-page="departamentos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          <span>Departamentos</span>
+        </div>
+        <div class="nav-item" data-page="equipe">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Equipe</span>
+        </div>
+        <div class="nav-item" data-page="fornecedores">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          <span>Fornecedores</span>
+        </div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Itens</div>
+        <div class="nav-item" data-page="categorias">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          <span>Categorias</span>
+        </div>
+        <div class="nav-item" data-page="itens">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          <span>Itens</span>
+        </div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Movimentações</div>
+        <div class="nav-item" data-page="entradas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+          <span>Entradas</span>
+        </div>
+        <div class="nav-item" data-page="saidas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V9"/><path d="M7 14l5-5 5 5"/><path d="M5 3h14"/></svg>
+          <span>Saídas</span>
+        </div>
+        <div class="nav-item" data-page="saldos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+          <span>Saldos</span>
+        </div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Relatórios</div>
+        <div class="nav-item" data-page="relEntradas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+          <span>Rel. Entradas</span>
+        </div>
+        <div class="nav-item" data-page="relSaidas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          <span>Rel. Saídas</span>
+        </div>
+        <div class="nav-item" data-page="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span>Painel de Indicadores</span>
+        </div>
+      </div>
+    </nav>
+  </aside>
+  <div class="overlay" id="overlay"></div>
+
+  <!-- ===================== MAIN ===================== -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="btn-menu" id="btnMenu" title="Menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="topbar-title" id="topbarTitle">Painel de Indicadores</div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-secondary" id="btnExport" title="Exportar banco">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Exportar</span>
+        </button>
+        <button class="btn btn-secondary" id="btnImport" title="Importar banco">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span>Importar</span>
+        </button>
+        <button class="btn btn-ghost" id="btnSair" title="Sair">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Sair</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ===================== ALERT BAR ===================== -->
+    <div class="alert-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <span><strong>Atenção:</strong> seus dados ficam salvos no banco de dados do navegador. Caso precise limpar o histórico, faça um backup antes clicando em <strong>Exportar</strong>. Para restaurar os dados, basta clicar em <strong>Importar</strong> e selecionar o arquivo de backup. Sugerimos a realização de backups diariamente ao fim do dia.</span>
+    </div>
+
+    <main class="content" id="content">
+      <!-- PÁGINAS SERÃO INJETADAS AQUI -->
+    </main>
+  </div>
+</div>
+
+<!-- ===================== MODAL ===================== -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Confirmação</h3>
+      <button class="modal-close" id="modalClose">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<!-- Input file oculto para importação -->
+<input type="file" id="fileImport" accept=".json" style="display:none">
+
+<script>
+/* =========================================================
+   ESTOQUE INTELIGENTE - JAVASCRIPT
+   ========================================================= */
+
+/* =========================================================
+   1. UTILITÁRIOS
+   ========================================================= */
+const Utils = {
+  brl(v){
+    const n = Number(v)||0;
+    return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  },
+  num(v,dec=2){
+    const n = Number(v)||0;
+    return n.toLocaleString('pt-BR',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+  },
+  data(v){
+    if(!v) return '';
+    const d = (v instanceof Date)?v:new Date(v);
+    if(isNaN(d)) return '';
+    const dd = String(d.getDate()).padStart(2,'0');
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const aa = d.getFullYear();
+    return `${dd}/${mm}/${aa}`;
+  },
+  parseData(s){
+    if(!s) return null;
+    const [a,m,d] = s.split('-').map(Number);
+    return new Date(a,m-1,d);
+  },
+  toInputDate(d){
+    if(!d) return '';
+    const dt = (d instanceof Date)?d:new Date(d);
+    if(isNaN(dt)) return '';
+    const a = dt.getFullYear();
+    const m = String(dt.getMonth()+1).padStart(2,'0');
+    const dd = String(dt.getDate()).padStart(2,'0');
+    return `${a}-${m}-${dd}`;
+  },
+  cnpj(v){
+    const n = String(v||'').replace(/\D/g,'').padStart(14,'0');
+    return n.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,'$1.$2.$3/$4-$5');
+  },
+  tel(v){
+    const n = String(v||'').replace(/\D/g,'');
+    if(n.length===11) return n.replace(/(\d{2})(\d{5})(\d{4})/,'($1) $2-$3');
+    if(n.length===10) return n.replace(/(\d{2})(\d{4})(\d{4})/,'($1) $2-$3');
+    return v||'';
+  },
+  uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); },
+  esc(s){
+    if(s==null) return '';
+    return String(s).replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  },
+  hoje(){ return this.toInputDate(new Date()); },
+  mesAnoAtual(){
+    const d = new Date();
+    return { mes:d.getMonth()+1, ano:d.getFullYear() };
+  }
+};
+
+/* =========================================================
+   2. INDEXEDDB WRAPPER
+   ========================================================= */
+const DB = {
+  name:'EstoqueInteligente',
+  version:1,
+  db:null,
+  stores:['config','departamentos','equipe','fornecedores','categorias','itens','entradas','saidas'],
+
+  open(){
+    return new Promise((resolve,reject)=>{
+      const req = indexedDB.open(this.name,this.version);
+      req.onupgradeneeded = (e)=>{
+        const db = e.target.result;
+        this.stores.forEach(s=>{
+          if(!db.objectStoreNames.contains(s)){
+            db.createObjectStore(s,{keyPath:'id'});
+          }
+        });
+      };
+      req.onsuccess = (e)=>{ this.db = e.target.result; resolve(this.db); };
+      req.onerror = (e)=>reject(e.target.error);
+    });
+  },
+  tx(store,mode='readonly'){
+    return this.db.transaction(store,mode).objectStore(store);
+  },
+  add(store,obj){
+    return new Promise((resolve,reject)=>{
+      const r = this.tx(store,'readwrite').add(obj);
+      r.onsuccess = ()=>resolve(obj);
+      r.onerror = ()=>reject(r.error);
+    });
+  },
+  put(store,obj){
+    return new Promise((resolve,reject)=>{
+      const r = this.tx(store,'readwrite').put(obj);
+      r.onsuccess = ()=>resolve(obj);
+      r.onerror = ()=>reject(r.error);
+    });
+  },
+  delete(store,id){
+    return new Promise((resolve,reject)=>{
+      const r = this.tx(store,'readwrite').delete(id);
+      r.onsuccess = ()=>resolve();
+      r.onerror = ()=>reject(r.error);
+    });
+  },
+  get(store,id){
+    return new Promise((resolve,reject)=>{
+      const r = this.tx(store).get(id);
+      r.onsuccess = ()=>resolve(r.result);
+      r.onerror = ()=>reject(r.error);
+    });
+  },
+  all(store){
+    return new Promise((resolve,reject)=>{
+      const r = this.tx(store).getAll();
+      r.onsuccess = ()=>resolve(r.result||[]);
+      r.onerror = ()=>reject(r.error);
+    });
+  },
+  clear(store){
+    return new Promise((resolve,reject)=>{
+      const r = this.tx(store,'readwrite').clear();
+      r.onsuccess = ()=>resolve();
+      r.onerror = ()=>reject(r.error);
+    });
+  },
+  async exportAll(){
+    const out = {};
+    for(const s of this.stores){
+      out[s] = await this.all(s);
+    }
+    return out;
+  },
+  async importAll(data){
+    for(const s of this.stores){
+      if(Array.isArray(data[s])){
+        await this.clear(s);
+        for(const item of data[s]){
+          await this.put(s,item);
+        }
+      }
+    }
+  }
+};
+
+/* =========================================================
+   3. NAVEGAÇÃO / ROTEAMENTO
+   ========================================================= */
+const App = {
+  currentPage:null,
+  titles:{
+    departamentos:'Departamentos',
+    equipe:'Equipe',
+    fornecedores:'Fornecedores',
+    categorias:'Categorias',
+    itens:'Itens',
+    entradas:'Entradas de Estoque',
+    saidas:'Saídas de Estoque',
+    saldos:'Saldos',
+    relEntradas:'Relatório de Entradas',
+    relSaidas:'Relatório de Saídas',
+    dashboard:'Painel de Indicadores'
+  },
+  async init(){
+    await DB.open();
+    this.bindTopbar();
+    this.bindNav();
+    this.checkLogin();
+  },
+  checkLogin(){
+    const isLoggedIn = sessionStorage.getItem('ei_logged_in') === 'true';
+    if(!isLoggedIn){
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.querySelector('.app').style.display = 'none';
+    } else {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.querySelector('.app').style.display = 'flex';
+      this.go('dashboard');
+    }
+  },
+  login(user, pass){
+    if(user === 'admin' && pass === '551055'){
+      sessionStorage.setItem('ei_logged_in', 'true');
+      document.getElementById('loginScreen').style.display = 'none';
+      document.querySelector('.app').style.display = 'flex';
+      this.go('dashboard');
+      return true;
+    }
+    return false;
+  },
+  bindNav(){
+    document.querySelectorAll('.nav-item').forEach(el=>{
+      el.addEventListener('click',()=>{
+        this.go(el.dataset.page);
+        if(window.innerWidth<=960){
+          document.getElementById('sidebar').classList.remove('open');
+          document.getElementById('overlay').classList.remove('active');
+        }
+      });
+    });
+  },
+  bindTopbar(){
+    document.getElementById('btnMenu').addEventListener('click',()=>{
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('overlay').classList.toggle('active');
+    });
+    document.getElementById('overlay').addEventListener('click',()=>{
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('overlay').classList.remove('active');
+    });
+    document.getElementById('btnExport').addEventListener('click',()=>this.exportarBanco());
+    document.getElementById('btnImport').addEventListener('click',()=>document.getElementById('fileImport').click());
+    document.getElementById('fileImport').addEventListener('change',e=>this.importarBanco(e));
+    document.getElementById('btnSair').addEventListener('click',()=>this.sair());
+  },
+  async go(page){
+    this.currentPage = page;
+    document.querySelectorAll('.nav-item').forEach(el=>{
+      el.classList.toggle('active',el.dataset.page===page);
+    });
+    document.getElementById('topbarTitle').textContent = this.titles[page]||'';
+    const content = document.getElementById('content');
+    content.innerHTML = '';
+    if(Pages[page]) await Pages[page].render(content);
+  },
+  async exportarBanco(){
+    try{
+      const data = await DB.exportAll();
+      const json = JSON.stringify(data,null,2);
+      const blob = new Blob([json],{type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const d = new Date();
+      const stamp = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+      a.href = url;
+      a.download = `estoque-inteligente-${stamp}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      Toast.success('Banco exportado com sucesso!');
+    }catch(e){
+      console.error(e);
+      Toast.error('Erro ao exportar banco.');
+    }
+  },
+  async importarBanco(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    Modal.confirm(
+      'Importar banco de dados',
+      'Isso substituirá todos os dados atuais. Deseja continuar?',
+      async ()=>{
+        try{
+          const text = await file.text();
+          const data = JSON.parse(text);
+          await DB.importAll(data);
+          Toast.success('Banco importado com sucesso!');
+          this.go(this.currentPage);
+        }catch(err){
+          console.error(err);
+          Toast.error('Arquivo inválido.');
+        }
+      }
+    );
+    e.target.value = '';
+  },
+  sair(){
+    Modal.confirm('Sair','Deseja sair do sistema?',()=>{
+      sessionStorage.removeItem('ei_logged_in');
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.querySelector('.app').style.display = 'none';
+      document.getElementById('loginUser').value = '';
+      document.getElementById('loginPass').value = '';
+      document.getElementById('loginError').style.display = 'none';
+    });
+  }
+};
+
+/* =========================================================
+   4. MODAL / TOAST
+   ========================================================= */
+const Modal = {
+  el:document.getElementById('modal'),
+  title:document.getElementById('modalTitle'),
+  body:document.getElementById('modalBody'),
+  footer:document.getElementById('modalFooter'),
+  open(title,bodyHtml,footerHtml=''){
+    this.title.textContent = title;
+    this.body.innerHTML = bodyHtml;
+    this.footer.innerHTML = footerHtml;
+    this.el.classList.add('active');
+  },
+  close(){ this.el.classList.remove('active'); },
+  alert(title,msg){
+    this.open(title,`<p>${Utils.esc(msg)}</p>`,
+      `<button class="btn btn-primary" onclick="Modal.close()">OK</button>`);
+  },
+  confirm(title,msg,onOk){
+    this.open(title,`<p>${Utils.esc(msg)}</p>`,
+      `<button class="btn btn-secondary" onclick="Modal.close()">Cancelar</button>
+       <button class="btn btn-danger" id="modalOk">Confirmar</button>`);
+    document.getElementById('modalOk').addEventListener('click',()=>{
+      this.close(); onOk();
+    });
+  }
+};
+document.getElementById('modalClose').addEventListener('click',()=>Modal.close());
+document.getElementById('modal').addEventListener('click',e=>{
+  if(e.target.id==='modal') Modal.close();
+});
+
+const Toast = {
+  show(msg,type='info',ms=3000){
+    const c = document.getElementById('toasts');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(()=>{
+      t.style.opacity='0';
+      t.style.transform='translateX(100%)';
+      t.style.transition='.3s';
+      setTimeout(()=>t.remove(),300);
+    },ms);
+  },
+  success(m){this.show(m,'success')},
+  error(m){this.show(m,'error')},
+  warning(m){this.show(m,'warning')}
+};
+
+/* =========================================================
+   5. MÓDULOS DE PÁGINA
+   ========================================================= */
+const Pages = {};
+
+const Icons = {
+  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
+  del:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>',
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+  img:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>'
+};
+
+/* =========================================================
+   CRUD GENÉRICO (Departamentos, Categorias)
+   ========================================================= */
+function crudSimples(store,{titulo,campos,cols,formatRow}){
+  return {
+    async render(root){
+      root.innerHTML = `
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Cadastro de ${titulo}</div>
+          </div>
+          <form id="form">
+            <div class="form-grid">
+              ${campos.map(c=>`
+                <div class="form-group ${c.full?'full':''}">
+                  <label class="form-label">${c.label} ${c.req?'<span class="req">*</span>':''}</label>
+                  <input type="${c.type||'text'}" class="form-control" id="f_${c.key}" ${c.req?'required':''}>
+                </div>`).join('')}
+            </div>
+            <input type="hidden" id="editId">
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">${Icons.plus} Salvar</button>
+              <button type="button" class="btn btn-secondary" id="btnLimpar">Limpar</button>
+            </div>
+          </form>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">${titulo} cadastrados</div>
+            <div class="search-bar">
+              ${Icons.search}
+              <input type="text" id="search" placeholder="Pesquisar...">
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>${cols.map(c=>`<th>${c.label}</th>`).join('')}<th style="width:100px">Ações</th></tr></thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      `;
+      const form = document.getElementById('form');
+      const tbody = document.getElementById('tbody');
+      const search = document.getElementById('search');
+
+      const load = async()=>{
+        const all = await DB.all(store);
+        const q = search.value.trim().toLowerCase();
+        const filt = q ? all.filter(r=>cols.some(c=>String(r[c.key]||'').toLowerCase().includes(q))) : all;
+        if(filt.length===0){
+          tbody.innerHTML = `<tr class="empty"><td colspan="${cols.length+1}">Nenhum registro encontrado.</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = filt.map(r=>`
+          <tr>
+            ${formatRow(r).map(v=>`<td>${v}</td>`).join('')}
+            <td>
+              <div class="row-actions">
+                <button title="Editar" data-edit="${r.id}">${Icons.edit}</button>
+                <button title="Excluir" class="delete" data-del="${r.id}">${Icons.del}</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+        tbody.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>edit(b.dataset.edit)));
+        tbody.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>del(b.dataset.del)));
+      };
+      const edit = async(id)=>{
+        const r = await DB.get(store,id);
+        if(!r) return;
+        document.getElementById('editId').value = r.id;
+        campos.forEach(c=>document.getElementById('f_'+c.key).value = r[c.key]||'');
+      };
+      const del = async(id)=>{
+        Modal.confirm('Excluir','Deseja realmente excluir este registro?',async()=>{
+          await DB.delete(store,id);
+          Toast.success('Registro excluído.');
+          if(document.getElementById('editId').value===id) form.reset();
+          load();
+        });
+      };
+      form.addEventListener('submit',async e=>{
+        e.preventDefault();
+        const id = document.getElementById('editId').value;
+        const obj = id ? await DB.get(store,id) : { id:Utils.uid() };
+        campos.forEach(c=>obj[c.key] = document.getElementById('f_'+c.key).value.trim());
+        await DB.put(store,obj);
+        Toast.success('Registro salvo!');
+        form.reset();
+        document.getElementById('editId').value = '';
+        load();
+      });
+      document.getElementById('btnLimpar').addEventListener('click',()=>form.reset());
+      search.addEventListener('input',load);
+      load();
+    }
+  };
+}
+
+/* ---------- DEPARTAMENTOS ---------- */
+Pages.departamentos = crudSimples('departamentos',{
+  titulo:'Departamentos',
+  campos:[{key:'nome',label:'Nome do departamento',req:true,full:true}],
+  cols:[{key:'nome',label:'Nome'}],
+  formatRow:r=>[Utils.esc(r.nome)]
+});
+
+/* ---------- CATEGORIAS ---------- */
+Pages.categorias = crudSimples('categorias',{
+  titulo:'Categorias',
+  campos:[{key:'nome',label:'Nome da categoria',req:true,full:true}],
+  cols:[{key:'nome',label:'Nome'}],
+  formatRow:r=>[Utils.esc(r.nome)]
+});
+
+/* =========================================================
+   EQUIPE
+   ========================================================= */
+Pages.equipe = {
+  async render(root){
+    const deps = await DB.all('departamentos');
+    root.innerHTML = `
+      <div class="card">
+        <div class="card-header"><div class="card-title">Cadastro de Equipe</div></div>
+        <form id="form">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label class="form-label">Nome completo <span class="req">*</span></label>
+              <input type="text" class="form-control" id="f_nome" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Função</label>
+              <input type="text" class="form-control" id="f_funcao">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Departamento</label>
+              <select class="form-control" id="f_dep">
+                <option value="">-- Selecione --</option>
+                ${deps.map(d=>`<option value="${d.id}">${Utils.esc(d.nome)}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select class="form-control" id="f_status">
+                <option value="Ativo">Ativo</option>
+                <option value="Inativo">Inativo</option>
+              </select>
+            </div>
+          </div>
+          <input type="hidden" id="editId">
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">${Icons.plus} Salvar</button>
+            <button type="button" class="btn btn-secondary" id="btnLimpar">Limpar</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Equipe cadastrada</div>
+          <div class="search-bar">${Icons.search}<input type="text" id="search" placeholder="Pesquisar..."></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nome</th><th>Função</th><th>Departamento</th><th>Status</th><th style="width:100px">Ações</th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    `;
+    const form = document.getElementById('form');
+    const tbody = document.getElementById('tbody');
+    const search = document.getElementById('search');
+
+    const depMap = {};
+    deps.forEach(d=>depMap[d.id]=d.nome);
+
+    const load = async()=>{
+      const all = await DB.all('equipe');
+      const q = search.value.trim().toLowerCase();
+      const filt = q ? all.filter(r=>
+        (r.nome||'').toLowerCase().includes(q) ||
+        (r.funcao||'').toLowerCase().includes(q) ||
+        (depMap[r.departamentoId]||'').toLowerCase().includes(q)
+      ) : all;
+      if(filt.length===0){
+        tbody.innerHTML = `<tr class="empty"><td colspan="5">Nenhum registro encontrado.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = filt.map(r=>`
+        <tr>
+          <td>${Utils.esc(r.nome)}</td>
+          <td>${Utils.esc(r.funcao||'')}</td>
+          <td>${Utils.esc(depMap[r.departamentoId]||'')}</td>
+          <td><span class="badge ${r.status==='Ativo'?'badge-success':'badge-warning'}">${Utils.esc(r.status||'')}</span></td>
+          <td>
+            <div class="row-actions">
+              <button title="Editar" data-edit="${r.id}">${Icons.edit}</button>
+              <button title="Excluir" class="delete" data-del="${r.id}">${Icons.del}</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+      tbody.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>edit(b.dataset.edit)));
+      tbody.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>del(b.dataset.del)));
+    };
+    const edit = async(id)=>{
+      const r = await DB.get('equipe',id);
+      if(!r) return;
+      document.getElementById('editId').value = r.id;
+      document.getElementById('f_nome').value = r.nome||'';
+      document.getElementById('f_funcao').value = r.funcao||'';
+      document.getElementById('f_dep').value = r.departamentoId||'';
+      document.getElementById('f_status').value = r.status||'Ativo';
+    };
+    const del = async(id)=>{
+      Modal.confirm('Excluir','Deseja realmente excluir este membro da equipe?',async()=>{
+        await DB.delete('equipe',id);
+        Toast.success('Registro excluído.');
+        if(document.getElementById('editId').value===id) form.reset();
+        load();
+      });
+    };
+    form.addEventListener('submit',async e=>{
+      e.preventDefault();
+      const id = document.getElementById('editId').value;
+      const obj = id ? await DB.get('equipe',id) : { id:Utils.uid() };
+      obj.nome = document.getElementById('f_nome').value.trim();
+      obj.funcao = document.getElementById('f_funcao').value.trim();
+      obj.departamentoId = document.getElementById('f_dep').value;
+      obj.status = document.getElementById('f_status').value;
+      await DB.put('equipe',obj);
+      Toast.success('Registro salvo!');
+      form.reset();
+      document.getElementById('editId').value = '';
+      load();
+    });
+    document.getElementById('btnLimpar').addEventListener('click',()=>form.reset());
+    search.addEventListener('input',load);
+    load();
+  }
+};
+
+/* =========================================================
+   FORNECEDORES
+   ========================================================= */
+Pages.fornecedores = {
+  async render(root){
+    root.innerHTML = `
+      <div class="card">
+        <div class="card-header"><div class="card-title">Cadastro de Fornecedores</div></div>
+        <form id="form">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label class="form-label">Razão social / Nome <span class="req">*</span></label>
+              <input type="text" class="form-control" id="f_nome" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">CNPJ</label>
+              <input type="text" class="form-control" id="f_cnpj" placeholder="00.000.000/0000-00" maxlength="18">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Contato</label>
+              <input type="text" class="form-control" id="f_contato">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Telefone</label>
+              <input type="text" class="form-control" id="f_tel">
+            </div>
+            <div class="form-group span-2">
+              <label class="form-label">E-mail</label>
+              <input type="email" class="form-control" id="f_email">
+            </div>
+            <div class="form-group full">
+              <label class="form-label">Endereço</label>
+              <input type="text" class="form-control" id="f_end">
+            </div>
+          </div>
+          <input type="hidden" id="editId">
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">${Icons.plus} Salvar</button>
+            <button type="button" class="btn btn-secondary" id="btnLimpar">Limpar</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Fornecedores cadastrados</div>
+          <div class="search-bar">${Icons.search}<input type="text" id="search" placeholder="Pesquisar..."></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nome</th><th>CNPJ</th><th>Contato</th><th>Telefone</th><th>E-mail</th><th style="width:100px">Ações</th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    `;
+    const form = document.getElementById('form');
+    const tbody = document.getElementById('tbody');
+    const search = document.getElementById('search');
+
+    // Formatação automática do CNPJ ao sair do campo
+    document.getElementById('f_cnpj').addEventListener('blur', function() {
+      this.value = Utils.cnpj(this.value);
+    });
+
+    const load = async()=>{
+      const all = await DB.all('fornecedores');
+      const q = search.value.trim().toLowerCase();
+      const filt = q ? all.filter(r=>
+        (r.nome||'').toLowerCase().includes(q) ||
+        (r.cnpj||'').toLowerCase().includes(q) ||
+        (r.contato||'').toLowerCase().includes(q)
+      ) : all;
+      if(filt.length===0){
+        tbody.innerHTML = `<tr class="empty"><td colspan="6">Nenhum registro encontrado.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = filt.map(r=>`
+        <tr>
+          <td>${Utils.esc(r.nome)}</td>
+          <td>${Utils.esc(r.cnpj||'')}</td>
+          <td>${Utils.esc(r.contato||'')}</td>
+          <td>${Utils.esc(r.telefone||'')}</td>
+          <td>${Utils.esc(r.email||'')}</td>
+          <td>
+            <div class="row-actions">
+              <button title="Editar" data-edit="${r.id}">${Icons.edit}</button>
+              <button title="Excluir" class="delete" data-del="${r.id}">${Icons.del}</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+      tbody.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>edit(b.dataset.edit)));
+      tbody.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>del(b.dataset.del)));
+    };
+    const edit = async(id)=>{
+      const r = await DB.get('fornecedores',id);
+      if(!r) return;
+      document.getElementById('editId').value = r.id;
+      document.getElementById('f_nome').value = r.nome||'';
+      document.getElementById('f_cnpj').value = Utils.cnpj(r.cnpj||'');
+      document.getElementById('f_contato').value = r.contato||'';
+      document.getElementById('f_tel').value = Utils.tel(r.telefone||'');
+      document.getElementById('f_email').value = r.email||'';
+      document.getElementById('f_end').value = r.endereco||'';
+    };
+    const del = async(id)=>{
+      Modal.confirm('Excluir','Deseja realmente excluir este fornecedor?',async()=>{
+        await DB.delete('fornecedores',id);
+        Toast.success('Registro excluído.');
+        if(document.getElementById('editId').value===id) form.reset();
+        load();
+      });
+    };
+    form.addEventListener('submit',async e=>{
+      e.preventDefault();
+      const id = document.getElementById('editId').value;
+      const obj = id ? await DB.get('fornecedores',id) : { id:Utils.uid() };
+      obj.nome = document.getElementById('f_nome').value.trim();
+      obj.cnpj = document.getElementById('f_cnpj').value.trim();
+      obj.contato = document.getElementById('f_contato').value.trim();
+      obj.telefone = document.getElementById('f_tel').value.trim();
+      obj.email = document.getElementById('f_email').value.trim();
+      obj.endereco = document.getElementById('f_end').value.trim();
+      await DB.put('fornecedores',obj);
+      Toast.success('Registro salvo!');
+      form.reset();
+      document.getElementById('editId').value = '';
+      load();
+    });
+    document.getElementById('btnLimpar').addEventListener('click',()=>form.reset());
+    search.addEventListener('input',load);
+    load();
+  }
+};
+
+/* =========================================================
+   ITENS
+   ========================================================= */
+Pages.itens = {
+  async render(root){
+    const cats = await DB.all('categorias');
+    root.innerHTML = `
+      <div class="card">
+        <div class="card-header"><div class="card-title">Cadastro de Itens</div></div>
+        <form id="form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Código interno <span class="req">*</span></label>
+              <input type="text" class="form-control" id="f_codigo" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Código de barras</label>
+              <input type="text" class="form-control" id="f_barras">
+            </div>
+            <div class="form-group full">
+              <label class="form-label">Descrição <span class="req">*</span></label>
+              <input type="text" class="form-control" id="f_desc" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unidade de medida <span class="req">*</span></label>
+              <select class="form-control" id="f_un" required>
+                <option value="">-- Selecione --</option>
+                <option value="UN">UN - Unidade</option>
+                <option value="KG">KG - Quilograma</option>
+                <option value="G">G - Grama</option>
+                <option value="L">L - Litro</option>
+                <option value="ML">ML - Mililitro</option>
+                <option value="M">M - Metro</option>
+                <option value="CM">CM - Centímetro</option>
+                <option value="CX">CX - Caixa</option>
+                <option value="PC">PC - Peça</option>
+                <option value="PCT">PCT - Pacote</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Categoria <span class="req">*</span></label>
+              <select class="form-control" id="f_cat" required>
+                <option value="">-- Selecione --</option>
+                ${cats.map(c=>`<option value="${c.id}">${Utils.esc(c.nome)}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Estoque mínimo</label>
+              <input type="number" class="form-control" id="f_min" step="0.01" min="0" value="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Estoque máximo</label>
+              <input type="number" class="form-control" id="f_max" step="0.01" min="0" value="0">
+            </div>
+            <div class="form-group full">
+              <label class="form-label">Foto</label>
+              <div class="photo-upload">
+                <div class="photo-preview" id="preview">${Icons.img}</div>
+                <div class="photo-actions">
+                  <input type="file" id="f_foto" accept="image/*" style="display:none">
+                  <button type="button" class="btn btn-secondary btn-sm" id="btnFoto">Adicionar / Atualizar foto</button>
+                  <button type="button" class="btn btn-ghost btn-sm" id="btnRemFoto">Remover</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <input type="hidden" id="editId">
+          <input type="hidden" id="f_fotoData">
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">${Icons.plus} Salvar</button>
+            <button type="button" class="btn btn-secondary" id="btnLimpar">Limpar</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Itens cadastrados</div>
+          <div class="search-bar">${Icons.search}<input type="text" id="search" placeholder="Pesquisar por código ou descrição..."></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Código</th><th>Barras</th><th>Descrição</th><th>UN</th><th>Categoria</th><th style="width:100px">Ações</th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    `;
+    const form = document.getElementById('form');
+    const tbody = document.getElementById('tbody');
+    const search = document.getElementById('search');
+    const preview = document.getElementById('preview');
+    const fotoData = document.getElementById('f_fotoData');
+
+    const catMap = {}; cats.forEach(c=>catMap[c.id]=c.nome);
+
+    document.getElementById('btnFoto').addEventListener('click',()=>document.getElementById('f_foto').click());
+    document.getElementById('f_foto').addEventListener('change',e=>{
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = ev=>{
+        fotoData.value = ev.target.result;
+        preview.innerHTML = `<img src="${ev.target.result}">`;
+      };
+      reader.readAsDataURL(file);
+    });
+    document.getElementById('btnRemFoto').addEventListener('click',()=>{
+      fotoData.value = '';
+      preview.innerHTML = Icons.img;
+      document.getElementById('f_foto').value = '';
+    });
+
+    const load = async()=>{
+      const all = await DB.all('itens');
+      const q = search.value.trim().toLowerCase();
+      const filt = q ? all.filter(r=>
+        (r.codigo||'').toLowerCase().includes(q) ||
+        (r.descricao||'').toLowerCase().includes(q) ||
+        (r.barras||'').toLowerCase().includes(q)
+      ) : all;
+      if(filt.length===0){
+        tbody.innerHTML = `<tr class="empty"><td colspan="6">Nenhum registro encontrado.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = filt.map(r=>`
+        <tr>
+          <td>${Utils.esc(r.codigo)}</td>
+          <td>${Utils.esc(r.barras||'')}</td>
+          <td>${Utils.esc(r.descricao)}</td>
+          <td>${Utils.esc(r.unidade||'')}</td>
+          <td>${Utils.esc(catMap[r.categoriaId]||'')}</td>
+          <td>
+            <div class="row-actions">
+              <button title="Editar" data-edit="${r.id}">${Icons.edit}</button>
+              <button title="Excluir" class="delete" data-del="${r.id}">${Icons.del}</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+      tbody.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>edit(b.dataset.edit)));
+      tbody.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>del(b.dataset.del)));
+    };
+    const edit = async(id)=>{
+      const r = await DB.get('itens',id);
+      if(!r) return;
+      document.getElementById('editId').value = r.id;
+      document.getElementById('f_codigo').value = r.codigo||'';
+      document.getElementById('f_barras').value = r.barras||'';
+      document.getElementById('f_desc').value = r.descricao||'';
+      document.getElementById('f_un').value = r.unidade||'';
+      document.getElementById('f_cat').value = r.categoriaId||'';
+      document.getElementById('f_min').value = r.min||0;
+      document.getElementById('f_max').value = r.max||0;
+      fotoData.value = r.foto||'';
+      preview.innerHTML = r.foto ? `<img src="${r.foto}">` : Icons.img;
+    };
+    const del = async(id)=>{
+      Modal.confirm('Excluir','Deseja realmente excluir este item?',async()=>{
+        await DB.delete('itens',id);
+        Toast.success('Registro excluído.');
+        if(document.getElementById('editId').value===id) form.reset();
+        load();
+      });
+    };
+    form.addEventListener('submit',async e=>{
+      e.preventDefault();
+      const id = document.getElementById('editId').value;
+      const obj = id ? await DB.get('itens',id) : { id:Utils.uid() };
+      obj.codigo = document.getElementById('f_codigo').value.trim();
+      obj.barras = document.getElementById('f_barras').value.trim();
+      obj.descricao = document.getElementById('f_desc').value.trim();
+      obj.unidade = document.getElementById('f_un').value;
+      obj.categoriaId = document.getElementById('f_cat').value;
+      obj.min = parseFloat(document.getElementById('f_min').value)||0;
+      obj.max = parseFloat(document.getElementById('f_max').value)||0;
+      obj.foto = fotoData.value||'';
+      await DB.put('itens',obj);
+      Toast.success('Registro salvo!');
+      form.reset();
+      document.getElementById('editId').value = '';
+      preview.innerHTML = Icons.img;
+      fotoData.value = '';
+      load();
+    });
+    document.getElementById('btnLimpar').addEventListener('click',()=>{
+      form.reset();
+      preview.innerHTML = Icons.img;
+      fotoData.value = '';
+    });
+    search.addEventListener('input',load);
+    load();
+  }
+};
+
+/* =========================================================
+   ENTRADAS / SAÍDAS - Lógica compartilhada
+   ========================================================= */
+async function carregarItensMap(){
+  const itens = await DB.all('itens');
+  const map = {};
+  itens.forEach(i=>map[i.id]=i);
+  const byCodigo = {};
+  const byDesc = {};
+  itens.forEach(i=>{
+    if(i.codigo) byCodigo[i.codigo.toLowerCase()] = i;
+    if(i.descricao) byDesc[i.descricao.toLowerCase()] = i;
+  });
+  return { itens, map, byCodigo, byDesc };
+}
+
+/* ---------- ENTRADAS ---------- */
+Pages.entradas = {
+  async render(root){
+    const { itens, map:itMap } = await carregarItensMap();
+    const forn = await DB.all('fornecedores');
+    const tipos = ['Compra','Recebimento de Devolução','Outras'];
+
+    // Ordenar itens alfabeticamente por descrição para o dropdown
+    const itensOrdenados = [...itens].sort((a, b) => (a.descricao || '').localeCompare(b.descricao || ''));
+
+    root.innerHTML = `
+      <div class="card">
+        <div class="card-header"><div class="card-title">Entrada de Estoque</div></div>
+        <form id="form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Data <span class="req">*</span></label>
+              <input type="date" class="form-control" id="f_data" value="${Utils.hoje()}" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tipo <span class="req">*</span></label>
+              <select class="form-control" id="f_tipo" required>
+                ${tipos.map(t=>`<option value="${t}">${t}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Código interno</label>
+              <input type="text" class="form-control" id="f_codigo">
+            </div>
+            <div class="form-group full">
+              <label class="form-label">Descrição</label>
+              <select class="form-control" id="f_desc">
+                <option value="">-- Selecione um item --</option>
+                ${itensOrdenados.map(i => `<option value="${i.id}">${Utils.esc(i.descricao)}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unidade</label>
+              <input type="text" class="form-control" id="f_un" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Quantidade <span class="req">*</span></label>
+              <input type="number" class="form-control" id="f_qtd" step="0.0001" min="0" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Custo unitário <span class="req">*</span></label>
+              <input type="number" class="form-control" id="f_custo" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Custo total</label>
+              <input type="text" class="form-control" id="f_total" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fornecedor</label>
+              <select class="form-control" id="f_forn">
+                <option value="">-- Nenhum --</option>
+                ${forn.map(f=>`<option value="${f.id}">${Utils.esc(f.nome)}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nota Fiscal</label>
+              <input type="text" class="form-control" id="f_nf">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pedido de Compra</label>
+              <input type="text" class="form-control" id="f_pedido">
+            </div>
+            <div class="form-group full">
+              <label class="form-label">Observações</label>
+              <textarea class="form-control" id="f_obs"></textarea>
+            </div>
+          </div>
+          <input type="hidden" id="editId">
+          <input type="hidden" id="f_itemId">
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">${Icons.plus} Salvar</button>
+            <button type="button" class="btn btn-secondary" id="btnLimpar">Limpar</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Entradas registradas</div>
+          <div class="search-bar">${Icons.search}<input type="text" id="search" placeholder="Pesquisar..."></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Data</th><th>Tipo</th><th>Código</th><th>Descrição</th><th>UN</th><th>Qtd</th><th>Custo Unit.</th><th>Custo Total</th><th>Fornecedor</th><th style="width:100px">Ações</th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    `;
+    const form = document.getElementById('form');
+    const tbody = document.getElementById('tbody');
+    const search = document.getElementById('search');
+    const fornMap = {}; forn.forEach(f=>fornMap[f.id]=f.nome);
+
+    const fCodigo = document.getElementById('f_codigo');
+    const fDesc = document.getElementById('f_desc');
+    const fUn = document.getElementById('f_un');
+    const fItemId = document.getElementById('f_itemId');
+    const fQtd = document.getElementById('f_qtd');
+    const fCusto = document.getElementById('f_custo');
+    const fTotal = document.getElementById('f_total');
+
+    // Preenche automaticamente ao digitar o código interno
+    fCodigo.addEventListener('input', () => {
+      const v = fCodigo.value.trim().toLowerCase();
+      if (!v) {
+        fDesc.value = '';
+        fUn.value = '';
+        fItemId.value = '';
+        return;
+      }
+      const item = itens.find(i => (i.codigo || '').toLowerCase() === v);
+      if (item) {
+        fItemId.value = item.id;
+        fDesc.value = item.id;
+        fUn.value = item.unidade || '';
+      } else {
+        fItemId.value = '';
+        fUn.value = '';
+        fDesc.value = '';
+      }
+    });
+
+    // Preenche automaticamente ao selecionar na lista suspensa de Descrição
+    fDesc.addEventListener('change', () => {
+      const selectedId = fDesc.value;
+      const item = itens.find(i => i.id === selectedId);
+      if (item) {
+        fCodigo.value = item.codigo || '';
+        fUn.value = item.unidade || '';
+        fItemId.value = item.id;
+      } else {
+        fCodigo.value = '';
+        fUn.value = '';
+        fItemId.value = '';
+      }
+    });
+
+    const calcTotal = ()=>{
+      const q = parseFloat(fQtd.value)||0;
+      const c = parseFloat(fCusto.value)||0;
+      fTotal.value = Utils.brl(q*c);
+    };
+    fQtd.addEventListener('input',calcTotal);
+    fCusto.addEventListener('input',calcTotal);
+
+    const load = async()=>{
+      const all = await DB.all('entradas');
+      const q = search.value.trim().toLowerCase();
+      const filt = q ? all.filter(r=>
+        (r.codigo||'').toLowerCase().includes(q) ||
+        (r.descricao||'').toLowerCase().includes(q) ||
+        (r.nf||'').toLowerCase().includes(q)
+      ) : all;
+      filt.sort((a,b)=>(b.data||'').localeCompare(a.data||''));
+      if(filt.length===0){
+        tbody.innerHTML = `<tr class="empty"><td colspan="10">Nenhum registro encontrado.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = filt.map(r=>`
+        <tr>
+          <td>${Utils.data(r.data)}</td>
+          <td><span class="badge badge-info">${Utils.esc(r.tipo)}</span></td>
+          <td>${Utils.esc(r.codigo||'')}</td>
+          <td>${Utils.esc(r.descricao||'')}</td>
+          <td>${Utils.esc(r.unidade||'')}</td>
+          <td>${Utils.num(r.quantidade||0,3)}</td>
+          <td>${Utils.brl(r.custoUnit||0)}</td>
+          <td>${Utils.brl((r.quantidade||0)*(r.custoUnit||0))}</td>
+          <td>${Utils.esc(fornMap[r.fornecedorId]||'')}</td>
+          <td>
+            <div class="row-actions">
+              <button title="Editar" data-edit="${r.id}">${Icons.edit}</button>
+              <button title="Excluir" class="delete" data-del="${r.id}">${Icons.del}</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+      tbody.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>edit(b.dataset.edit)));
+      tbody.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>del(b.dataset.del)));
+    };
+    const edit = async(id)=>{
+      const r = await DB.get('entradas',id);
+      if(!r) return;
+      document.getElementById('editId').value = r.id;
+      document.getElementById('f_data').value = r.data||'';
+      document.getElementById('f_tipo').value = r.tipo||'Compra';
+      fCodigo.value = r.codigo||'';
+      fDesc.value = r.itemId||'';
+      fUn.value = r.unidade||'';
+      fItemId.value = r.itemId||'';
+      document.getElementById('f_qtd').value = r.quantidade||0;
+      document.getElementById('f_custo').value = r.custoUnit||0;
+      document.getElementById('f_forn').value = r.fornecedorId||'';
+      document.getElementById('f_nf').value = r.nf||'';
+      document.getElementById('f_pedido').value = r.pedido||'';
+      document.getElementById('f_obs').value = r.obs||'';
+      calcTotal();
+    };
+    const del = async(id)=>{
+      Modal.confirm('Excluir','Deseja realmente excluir esta entrada?',async()=>{
+        await DB.delete('entradas',id);
+        Toast.success('Registro excluído.');
+        if(document.getElementById('editId').value===id) form.reset();
+        load();
+      });
+    };
+    form.addEventListener('submit',async e=>{
+      e.preventDefault();
+      const id = document.getElementById('editId').value;
+      const obj = id ? await DB.get('entradas',id) : { id:Utils.uid() };
+      obj.data = document.getElementById('f_data').value;
+      obj.tipo = document.getElementById('f_tipo').value;
+      obj.itemId = fItemId.value;
+      obj.codigo = fCodigo.value;
+      obj.descricao = itens.find(i=>i.id===fItemId.value)?.descricao || fDesc.options[fDesc.selectedIndex]?.text || '';
+      obj.unidade = fUn.value;
+      obj.quantidade = parseFloat(fQtd.value)||0;
+      obj.custoUnit = parseFloat(fCusto.value)||0;
+      obj.fornecedorId = document.getElementById('f_forn').value;
+      obj.nf = document.getElementById('f_nf').value.trim();
+      obj.pedido = document.getElementById('f_pedido').value.trim();
+      obj.obs = document.getElementById('f_obs').value.trim();
+      await DB.put('entradas',obj);
+      Toast.success('Entrada registrada!');
+      form.reset();
+      document.getElementById('editId').value = '';
+      document.getElementById('f_data').value = Utils.hoje();
+      load();
+    });
+    document.getElementById('btnLimpar').addEventListener('click',()=>{
+      form.reset();
+      document.getElementById('f_data').value = Utils.hoje();
+    });
+    search.addEventListener('input',load);
+    load();
+  }
+};
+
+/* ---------- SAÍDAS ---------- */
+Pages.saidas = {
+  async render(root){
+    const { itens, map:itMap } = await carregarItensMap();
+    const entradas = await DB.all('entradas');
+    const saidas = await DB.all('saidas');
+    const equipe = await DB.all('equipe');
+    const departamentos = await DB.all('departamentos');
+    const tipos = ['Venda','Devolução','Doação','Descarte','Consumo interno','Outras'];
+
+    // Ordenar itens alfabeticamente por descrição para o dropdown
+    const itensOrdenados = [...itens].sort((a, b) => (a.descricao || '').localeCompare(b.descricao || ''));
+    
+    // Ordenar equipe e departamentos alfabeticamente
+    const equipeOrdenada = [...equipe].sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+    const departamentosOrdenados = [...departamentos].sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+
+    // Função para calcular o custo médio móvel de um item
+    const calcularCustoMedio = (itemId) => {
+      if (!itemId) return 0;
+      
+      const movs = [];
+      entradas.forEach(e => {
+        if (e.itemId === itemId) {
+          movs.push({ data: e.data, tipo: 'entrada', qtd: parseFloat(e.quantidade) || 0, custoUnit: parseFloat(e.custoUnit) || 0 });
+        }
+      });
+      saidas.forEach(s => {
+        if (s.itemId === itemId) {
+          movs.push({ data: s.data, tipo: 'saida', qtd: parseFloat(s.quantidade) || 0, custoUnit: parseFloat(s.custoUnit) || 0 });
+        }
+      });
+
+      // Ordenar por data e, em caso de empate, entradas antes de saídas
+      movs.sort((a, b) => {
+        if (a.data !== b.data) {
+          return (a.data || '').localeCompare(b.data || '');
+        }
+        if (a.tipo === 'entrada' && b.tipo === 'saida') return -1;
+        if (a.tipo === 'saida' && b.tipo === 'entrada') return 1;
+        return 0;
+      });
+
+      let saldoQtd = 0;
+      let saldoValor = 0;
+
+      for (const mov of movs) {
+        if (mov.tipo === 'entrada') {
+          saldoQtd += mov.qtd;
+          saldoValor += mov.qtd * mov.custoUnit;
+        } else {
+          const custoMedio = saldoQtd > 0 ? (saldoValor / saldoQtd) : 0;
+          saldoQtd -= mov.qtd;
+          saldoValor -= mov.qtd * custoMedio;
+        }
+      }
+
+      return saldoQtd > 0 ? (saldoValor / saldoQtd) : 0;
+    };
+
+    root.innerHTML = `
+      <div class="card">
+        <div class="card-header"><div class="card-title">Saída de Estoque</div></div>
+        <form id="form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Data <span class="req">*</span></label>
+              <input type="date" class="form-control" id="f_data" value="${Utils.hoje()}" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tipo <span class="req">*</span></label>
+              <select class="form-control" id="f_tipo" required>
+                ${tipos.map(t=>`<option value="${t}">${t}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Colaborador</label>
+              <select class="form-control" id="f_colaborador">
+                <option value="">-- Selecione --</option>
+                ${equipeOrdenada.map(e=>`<option value="${e.id}">${Utils.esc(e.nome)}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Setor</label>
+              <select class="form-control" id="f_setor">
+                <option value="">-- Selecione --</option>
+                ${departamentosOrdenados.map(d=>`<option value="${d.id}">${Utils.esc(d.nome)}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Código interno</label>
+              <input type="text" class="form-control" id="f_codigo">
+            </div>
+            <div class="form-group full">
+              <label class="form-label">Descrição</label>
+              <select class="form-control" id="f_desc">
+                <option value="">-- Selecione um item --</option>
+                ${itensOrdenados.map(i => `<option value="${i.id}">${Utils.esc(i.descricao)}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unidade</label>
+              <input type="text" class="form-control" id="f_un" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Quantidade <span class="req">*</span></label>
+              <input type="number" class="form-control" id="f_qtd" step="0.0001" min="0" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Custo médio do item</label>
+              <input type="text" class="form-control" id="f_custo" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nota Fiscal</label>
+              <input type="text" class="form-control" id="f_nf">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pedido de Venda</label>
+              <input type="text" class="form-control" id="f_pedido">
+            </div>
+            <div class="form-group full">
+              <label class="form-label">Observações</label>
+              <textarea class="form-control" id="f_obs"></textarea>
+            </div>
+          </div>
+          <input type="hidden" id="editId">
+          <input type="hidden" id="f_itemId">
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">${Icons.plus} Salvar</button>
+            <button type="button" class="btn btn-secondary" id="btnLimpar">Limpar</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Saídas registradas</div>
+          <div class="search-bar">${Icons.search}<input type="text" id="search" placeholder="Pesquisar..."></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Data</th><th>Tipo</th><th>Colaborador</th><th>Setor</th><th>Código</th><th>Descrição</th><th>UN</th><th>Qtd</th><th>Custo Unit.</th><th>Custo Total</th><th style="width:100px">Ações</th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    `;
+    const form = document.getElementById('form');
+    const tbody = document.getElementById('tbody');
+    const search = document.getElementById('search');
+
+    const fCodigo = document.getElementById('f_codigo');
+    const fDesc = document.getElementById('f_desc');
+    const fUn = document.getElementById('f_un');
+    const fItemId = document.getElementById('f_itemId');
+    const fCusto = document.getElementById('f_custo');
+    const fColaborador = document.getElementById('f_colaborador');
+    const fSetor = document.getElementById('f_setor');
+
+    const equipeMap = {};
+    equipe.forEach(e => equipeMap[e.id] = e.nome);
+    const departamentosMap = {};
+    departamentos.forEach(d => departamentosMap[d.id] = d.nome);
+
+    const atualizarCusto = ()=>{
+      const itemId = fItemId.value;
+      if (itemId) {
+        const custoMedio = calcularCustoMedio(itemId);
+        fCusto.value = Utils.brl(custoMedio);
+        fCusto.dataset.valor = custoMedio;
+      } else {
+        fCusto.value = '';
+        fCusto.dataset.valor = 0;
+      }
+    };
+
+    // Preenche automaticamente ao digitar o código interno
+    fCodigo.addEventListener('input', () => {
+      const v = fCodigo.value.trim().toLowerCase();
+      if (!v) {
+        fDesc.value = '';
+        fUn.value = '';
+        fItemId.value = '';
+        atualizarCusto();
+        return;
+      }
+      const item = itens.find(i => (i.codigo || '').toLowerCase() === v);
+      if (item) {
+        fItemId.value = item.id;
+        fDesc.value = item.id;
+        fUn.value = item.unidade || '';
+      } else {
+        fItemId.value = '';
+        fUn.value = '';
+        fDesc.value = '';
+      }
+      atualizarCusto();
+    });
+
+    // Preenche automaticamente ao selecionar na lista suspensa de Descrição
+    fDesc.addEventListener('change', () => {
+      const selectedId = fDesc.value;
+      const item = itens.find(i => i.id === selectedId);
+      if (item) {
+        fCodigo.value = item.codigo || '';
+        fUn.value = item.unidade || '';
+        fItemId.value = item.id;
+      } else {
+        fCodigo.value = '';
+        fUn.value = '';
+        fItemId.value = '';
+      }
+      atualizarCusto();
+    });
+
+    const load = async()=>{
+      const all = await DB.all('saidas');
+      const q = search.value.trim().toLowerCase();
+      const filt = q ? all.filter(r=>
+        (r.codigo||'').toLowerCase().includes(q) ||
+        (r.descricao||'').toLowerCase().includes(q) ||
+        (r.nf||'').toLowerCase().includes(q)
+      ) : all;
+      filt.sort((a,b)=>(b.data||'').localeCompare(a.data||''));
+      if(filt.length===0){
+        tbody.innerHTML = `<tr class="empty"><td colspan="11">Nenhum registro encontrado.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = filt.map(r=>`
+        <tr>
+          <td>${Utils.data(r.data)}</td>
+          <td><span class="badge badge-info">${Utils.esc(r.tipo)}</span></td>
+          <td>${Utils.esc(equipeMap[r.colaboradorId] || '')}</td>
+          <td>${Utils.esc(departamentosMap[r.setorId] || '')}</td>
+          <td>${Utils.esc(r.codigo||'')}</td>
+          <td>${Utils.esc(r.descricao||'')}</td>
+          <td>${Utils.esc(r.unidade||'')}</td>
+          <td>${Utils.num(r.quantidade||0,3)}</td>
+          <td>${Utils.brl(r.custoUnit||0)}</td>
+          <td>${Utils.brl((r.quantidade||0)*(r.custoUnit||0))}</td>
+          <td>
+            <div class="row-actions">
+              <button title="Editar" data-edit="${r.id}">${Icons.edit}</button>
+              <button title="Excluir" class="delete" data-del="${r.id}">${Icons.del}</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+      tbody.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>edit(b.dataset.edit)));
+      tbody.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>del(b.dataset.del)));
+    };
+    const edit = async(id)=>{
+      const r = await DB.get('saidas',id);
+      if(!r) return;
+      document.getElementById('editId').value = r.id;
+      document.getElementById('f_data').value = r.data||'';
+      document.getElementById('f_tipo').value = r.tipo||'Venda';
+      fColaborador.value = r.colaboradorId||'';
+      fSetor.value = r.setorId||'';
+      fCodigo.value = r.codigo||'';
+      fDesc.value = r.itemId||'';
+      fUn.value = r.unidade||'';
+      fItemId.value = r.itemId||'';
+      document.getElementById('f_qtd').value = r.quantidade||0;
+      document.getElementById('f_nf').value = r.nf||'';
+      document.getElementById('f_pedido').value = r.pedido||'';
+      document.getElementById('f_obs').value = r.obs||'';
+      atualizarCusto();
+    };
+    const del = async(id)=>{
+      Modal.confirm('Excluir','Deseja realmente excluir esta saída?',async()=>{
+        await DB.delete('saidas',id);
+        Toast.success('Registro excluído.');
+        if(document.getElementById('editId').value===id) form.reset();
+        load();
+      });
+    };
+    form.addEventListener('submit',async e=>{
+      e.preventDefault();
+      const id = document.getElementById('editId').value;
+      const obj = id ? await DB.get('saidas',id) : { id:Utils.uid() };
+      obj.data = document.getElementById('f_data').value;
+      obj.tipo = document.getElementById('f_tipo').value;
+      obj.colaboradorId = fColaborador.value;
+      obj.setorId = fSetor.value;
+      obj.itemId = fItemId.value;
+      obj.codigo = fCodigo.value;
+      obj.descricao = itens.find(i=>i.id===fItemId.value)?.descricao || fDesc.options[fDesc.selectedIndex]?.text || '';
+      obj.unidade = fUn.value;
+      obj.quantidade = parseFloat(document.getElementById('f_qtd').value)||0;
+      obj.custoUnit = parseFloat(fCusto.dataset.valor) || 0;
+      obj.nf = document.getElementById('f_nf').value.trim();
+      obj.pedido = document.getElementById('f_pedido').value.trim();
+      obj.obs = document.getElementById('f_obs').value.trim();
+      await DB.put('saidas',obj);
+      Toast.success('Saída registrada!');
+      form.reset();
+      document.getElementById('editId').value = '';
+      document.getElementById('f_data').value = Utils.hoje();
+      load();
+    });
+    document.getElementById('btnLimpar').addEventListener('click',()=>{
+      form.reset();
+      document.getElementById('f_data').value = Utils.hoje();
+    });
+    search.addEventListener('input',load);
+    load();
+  }
+};
+
+/* =========================================================
+   SALDOS
+   ========================================================= */
+Pages.saldos = {
+  async render(root){
+    const itens = await DB.all('itens');
+    const entradas = await DB.all('entradas');
+    const saidas = await DB.all('saidas');
+
+    const totEnt = {}, totSai = {}, ultCusto = {};
+    const entOrd = [...entradas].sort((a,b)=>(b.data||'').localeCompare(a.data||''));
+    entOrd.forEach(e=>{
+      if(!e.itemId) return;
+      totEnt[e.itemId] = (totEnt[e.itemId]||0) + (e.quantidade||0);
+      if(!ultCusto[e.itemId]) ultCusto[e.itemId] = e.custoUnit||0;
+    });
+    saidas.forEach(s=>{
+      if(!s.itemId) return;
+      totSai[s.itemId] = (totSai[s.itemId]||0) + (s.quantidade||0);
+    });
+
+    root.innerHTML = `
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Saldos de Estoque</div>
+          <div class="search-bar">${Icons.search}<input type="text" id="search" placeholder="Pesquisar..."></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Código</th><th>Barras</th><th>Descrição</th><th>UN</th><th>Saldo Atual</th><th>Valor em Estoque</th><th>Status</th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    `;
+    const tbody = document.getElementById('tbody');
+    const search = document.getElementById('search');
+
+    const render = ()=>{
+      const q = search.value.trim().toLowerCase();
+      const lista = itens.filter(i=>
+        !q || (i.codigo||'').toLowerCase().includes(q) ||
+        (i.descricao||'').toLowerCase().includes(q) ||
+        (i.barras||'').toLowerCase().includes(q)
+      );
+      if(lista.length===0){
+        tbody.innerHTML = `<tr class="empty"><td colspan="7">Nenhum item encontrado.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = lista.map(i=>{
+        const saldo = (totEnt[i.id]||0) - (totSai[i.id]||0);
+        const custo = ultCusto[i.id]||0;
+        const valor = saldo*custo;
+        let status='', cls='';
+        if(saldo < (i.min||0)){ status='ABAIXO DO ESTOQUE MÍNIMO'; cls='badge-danger'; }
+        else if(saldo > (i.max||0) && i.max>0){ status='ACIMA DO ESTOQUE MÁXIMO'; cls='badge-danger'; }
+        else { status='DENTRO DO ESTOQUE IDEAL'; cls='badge-success'; }
+        return `
+          <tr>
+            <td>${Utils.esc(i.codigo||'')}</td>
+            <td>${Utils.esc(i.barras||'')}</td>
+            <td>${Utils.esc(i.descricao||'')}</td>
+            <td>${Utils.esc(i.unidade||'')}</td>
+            <td>${Utils.num(saldo,3)}</td>
+            <td>${Utils.brl(valor)}</td>
+            <td><span class="badge ${cls}">${status}</span></td>
+          </tr>
+        `;
+      }).join('');
+    };
+    search.addEventListener('input',render);
+    render();
+  }
+};
+
+/* =========================================================
+   RELATÓRIOS (Entradas / Saídas)
+   ========================================================= */
+function relatorio(store,{titulo,tipos,filtroSetor=false}){
+  return {
+    async render(root){
+      const itens = await DB.all('itens');
+      const cats = await DB.all('categorias');
+      const forn = await DB.all('fornecedores');
+      const deps = await DB.all('departamentos');
+      const fornMap = {}; forn.forEach(f=>fornMap[f.id]=f.nome);
+      const itemMap = {}; itens.forEach(i=>itemMap[i.id]=i);
+      const depMap = {}; deps.forEach(d=>depMap[d.id]=d.nome);
+
+      const { mes, ano } = Utils.mesAnoAtual();
+      const primeiroDia = `${ano}-${String(mes).padStart(2,'0')}-01`;
+      const ultimoDiaObj = new Date(ano,mes,0);
+      const ultimoDia = Utils.toInputDate(ultimoDiaObj);
+
+      root.innerHTML = `
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">${titulo}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <button class="btn btn-success btn-sm" id="btnExcel">Excel</button>
+              <button class="btn btn-primary btn-sm" id="btnPdf">PDF</button>
+            </div>
+          </div>
+          <div class="filters">
+            <div class="form-group">
+              <label class="form-label">Data inicial</label>
+              <input type="date" class="form-control" id="f_di" value="${primeiroDia}">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Data final</label>
+              <input type="date" class="form-control" id="f_df" value="${ultimoDia}">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tipo</label>
+              <select class="form-control" id="f_tipo">
+                <option value="">Todos</option>
+                ${tipos.map(t=>`<option value="${t}">${t}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Categoria</label>
+              <select class="form-control" id="f_cat">
+                <option value="">Todas</option>
+                ${cats.map(c=>`<option value="${c.id}">${Utils.esc(c.nome)}</option>`).join('')}
+              </select>
+            </div>
+            ${filtroSetor ? `
+            <div class="form-group">
+              <label class="form-label">Setor</label>
+              <select class="form-control" id="f_setor">
+                <option value="">Todos</option>
+                ${deps.map(d=>`<option value="${d.id}">${Utils.esc(d.nome)}</option>`).join('')}
+              </select>
+            </div>` : ''}
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th>Data</th><th>Tipo</th>${filtroSetor ? '<th>Setor</th>' : ''}<th>Código</th><th>Barras</th><th>Descrição</th>
+                <th>UN</th><th>Fornecedor</th><th>NF</th><th>Qtd</th><th>Custo Unit.</th><th>Custo Total</th>
+              </tr></thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      `;
+      const tbody = document.getElementById('tbody');
+      const fDi = document.getElementById('f_di');
+      const fDf = document.getElementById('f_df');
+      const fTipo = document.getElementById('f_tipo');
+      const fCat = document.getElementById('f_cat');
+      const fSetor = filtroSetor ? document.getElementById('f_setor') : null;
+
+      let dados = [];
+      const calc = async()=>{
+        const all = await DB.all(store);
+        const di = fDi.value, df = fDf.value, tipo = fTipo.value, cat = fCat.value, setor = fSetor ? fSetor.value : '';
+        dados = all.filter(r=>{
+          if(di && r.data<di) return false;
+          if(df && r.data>df) return false;
+          if(tipo && r.tipo!==tipo) return false;
+          if(cat){
+            const it = itemMap[r.itemId];
+            if(!it || it.categoriaId!==cat) return false;
+          }
+          if(setor && r.setorId !== setor) return false;
+          return true;
+        });
+        dados.sort((a,b)=>(a.data||'').localeCompare(b.data||''));
+        render();
+      };
+      const render = ()=>{
+        if(dados.length===0){
+          tbody.innerHTML = `<tr class="empty"><td colspan="${filtroSetor ? 12 : 11}">Nenhum registro encontrado.</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = dados.map(r=>{
+          const it = itemMap[r.itemId]||{};
+          const total = (r.quantidade||0)*(r.custoUnit||0);
+          return `
+            <tr>
+              <td>${Utils.data(r.data)}</td>
+              <td>${Utils.esc(r.tipo)}</td>
+              ${filtroSetor ? `<td>${Utils.esc(depMap[r.setorId] || '')}</td>` : ''}
+              <td>${Utils.esc(r.codigo||'')}</td>
+              <td>${Utils.esc(it.barras||'')}</td>
+              <td>${Utils.esc(r.descricao||'')}</td>
+              <td>${Utils.esc(r.unidade||'')}</td>
+              <td>${Utils.esc(fornMap[r.fornecedorId]||'')}</td>
+              <td>${Utils.esc(r.nf||'')}</td>
+              <td>${Utils.num(r.quantidade||0,3)}</td>
+              <td>${Utils.brl(r.custoUnit||0)}</td>
+              <td>${Utils.brl(total)}</td>
+            </tr>
+          `;
+        }).join('');
+      };
+      const filters = [fDi, fDf, fTipo, fCat];
+      if (fSetor) filters.push(fSetor);
+      filters.forEach(el=>el.addEventListener('change',calc));
+
+      document.getElementById('btnExcel').addEventListener('click',()=>{
+        if(dados.length===0){ Toast.warning('Sem dados para exportar.'); return; }
+        const headers = ['Data','Tipo', ...(filtroSetor ? ['Setor'] : []), 'Código','Barras','Descrição','UN','Fornecedor','NF','Quantidade','Custo Unit.','Custo Total'];
+        const rows = dados.map(r=>{
+          const it = itemMap[r.itemId]||{};
+          return [
+            Utils.data(r.data), r.tipo, ...(filtroSetor ? [depMap[r.setorId] || ''] : []), r.codigo||'', it.barras||'', r.descricao||'',
+            r.unidade||'', fornMap[r.fornecedorId]||'', r.nf||'',
+            (r.quantidade||0).toFixed(3).replace('.',','),
+            (r.custoUnit||0).toFixed(2).replace('.',','),
+            ((r.quantidade||0)*(r.custoUnit||0)).toFixed(2).replace('.',',')
+          ];
+        });
+        const csv = '\uFEFF' + [headers,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
+        const blob = new Blob([csv],{type:'text/csv;charset=utf-8'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `${titulo.replace(/\s/g,'_')}.csv`; a.click();
+        URL.revokeObjectURL(url);
+        Toast.success('Excel exportado!');
+      });
+
+      document.getElementById('btnPdf').addEventListener('click',()=>{
+        if(dados.length===0){ Toast.warning('Sem dados para exportar.'); return; }
+        DB.get('config','empresa').then(emp=>{
+          const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${titulo}</title>
+          <style>
+            body{font-family:Poppins,Arial,sans-serif;padding:20px;color:#333}
+            h1{color:#0b1e3f;font-size:1.3rem;margin-bottom:4px}
+            h2{color:#0b1e3f;font-size:1rem;margin-bottom:14px;font-weight:500}
+            .meta{font-size:.8rem;color:#666;margin-bottom:14px}
+            table{width:100%;border-collapse:collapse;font-size:.78rem}
+            th{background:#0b1e3f;color:#fff;padding:8px;text-align:left}
+            td{padding:7px 8px;border-bottom:1px solid #eee}
+            tr:nth-child(even) td{background:#f7f8fa}
+            @media print{body{padding:10px}}
+          </style></head><body>
+          <h1>${Utils.esc(emp?.nome||'Estoque Inteligente')}</h1>
+          <h2>${titulo}</h2>
+          <div class="meta">Período: ${Utils.data(fDi.value)} a ${Utils.data(fDf.value)} | Tipo: ${fTipo.value||'Todos'} | Categoria: ${fCat.value?Utils.esc((cats.find(c=>c.id===fCat.value)||{}).nome||''):'Todas'}${filtroSetor && fSetor.value ? ' | Setor: '+Utils.esc(depMap[fSetor.value]||'') : ''}</div>
+          <table><thead><tr>
+            <th>Data</th><th>Tipo</th>${filtroSetor ? '<th>Setor</th>' : ''}<th>Código</th><th>Descrição</th><th>UN</th><th>Fornecedor</th><th>NF</th><th>Qtd</th><th>Custo Unit.</th><th>Custo Total</th>
+          </tr></thead><tbody>
+          ${dados.map(r=>{
+            const it = itemMap[r.itemId]||{};
+            const total = (r.quantidade||0)*(r.custoUnit||0);
+            return `<tr>
+              <td>${Utils.data(r.data)}</td><td>${Utils.esc(r.tipo)}</td>
+              ${filtroSetor ? `<td>${Utils.esc(depMap[r.setorId] || '')}</td>` : ''}
+              <td>${Utils.esc(r.codigo||'')}</td><td>${Utils.esc(r.descricao||'')}</td>
+              <td>${Utils.esc(r.unidade||'')}</td><td>${Utils.esc(fornMap[r.fornecedorId]||'')}</td>
+              <td>${Utils.esc(r.nf||'')}</td><td>${Utils.num(r.quantidade||0,3)}</td>
+              <td>${Utils.brl(r.custoUnit||0)}</td><td>${Utils.brl(total)}</td>
+            </tr>`;
+          }).join('')}
+          </tbody></table></body></html>`;
+          const w = window.open('','_blank');
+          w.document.write(html);
+          w.document.close();
+          setTimeout(()=>w.print(),400);
+        });
+      });
+
+      calc();
+    }
+  };
+}
+
+Pages.relEntradas = relatorio('entradas',{
+  titulo:'Relatório de Entradas',
+  tipos:['Compra','Recebimento de Devolução','Outras']
+});
+Pages.relSaidas = relatorio('saidas',{
+  titulo:'Relatório de Saídas',
+  tipos:['Venda','Devolução','Doação','Descarte','Consumo interno','Outras'],
+  filtroSetor: true
+});
+
+/* =========================================================
+   DASHBOARD / PAINEL DE INDICADORES
+   ========================================================= */
+Pages.dashboard = {
+  async render(root){
+    const itens = await DB.all('itens');
+    const cats = await DB.all('categorias');
+    const forn = await DB.all('fornecedores');
+    const deps = await DB.all('departamentos');
+    const entradas = await DB.all('entradas');
+    const saidas = await DB.all('saidas');
+    const { mes, ano } = Utils.mesAnoAtual();
+
+    root.innerHTML = `
+      <div class="card">
+        <div class="card-header"><div class="card-title">Painel de Indicadores</div></div>
+        <div class="filters">
+          <div class="form-group">
+            <label class="form-label">Mês</label>
+            <select class="form-control" id="f_mes">
+              ${[1,2,3,4,5,6,7,8,9,10,11,12].map(m=>`<option value="${m}" ${m===mes?'selected':''}>${m}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ano</label>
+            <input type="number" class="form-control" id="f_ano" value="${ano}" min="2000" max="2100">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tipo</label>
+            <select class="form-control" id="f_tipo">
+              <option value="">Todos</option>
+              <option>Compra</option><option>Venda</option><option>Devolução</option>
+              <option>Doação</option><option>Descarte</option><option>Consumo interno</option><option>Outras</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Categoria</label>
+            <select class="form-control" id="f_cat">
+              <option value="">Todas</option>
+              ${cats.map(c=>`<option value="${c.id}">${Utils.esc(c.nome)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fornecedor</label>
+            <select class="form-control" id="f_forn">
+              <option value="">Todos</option>
+              ${forn.map(f=>`<option value="${f.id}">${Utils.esc(f.nome)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Item (opcional)</label>
+            <select class="form-control" id="f_item">
+              <option value="">Todos</option>
+              ${itens.map(i=>`<option value="${i.id}">${Utils.esc(i.codigo)} - ${Utils.esc(i.descricao)}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="kpi-grid" id="kpis"></div>
+      <div class="chart-grid" id="charts"></div>
+    `;
+    const itemMap = {}; itens.forEach(i=>itemMap[i.id]=i);
+    const fornMap = {}; forn.forEach(f=>fornMap[f.id]=f.nome);
+    const depMap = {}; deps.forEach(d=>depMap[d.id]=d.nome);
+    const catMap = {}; cats.forEach(c=>catMap[c.id]=c.nome);
+
+    const fMes = document.getElementById('f_mes');
+    const fAno = document.getElementById('f_ano');
+    const fTipo = document.getElementById('f_tipo');
+    const fCat = document.getElementById('f_cat');
+    const fForn = document.getElementById('f_forn');
+    const fItem = document.getElementById('f_item');
+
+    const aplicarFiltros = (lista)=>{
+      const mes = parseInt(fMes.value);
+      const ano = parseInt(fAno.value);
+      const tipo = fTipo.value;
+      const cat = fCat.value;
+      const fornId = fForn.value;
+      const itemId = fItem.value;
+      return lista.filter(r=>{
+        if(!r.data) return false;
+        const d = new Date(r.data+'T00:00:00');
+        if(d.getMonth()+1 !== mes || d.getFullYear() !== ano) return false;
+        if(tipo && r.tipo!==tipo) return false;
+        if(cat){
+          const it = itemMap[r.itemId];
+          if(!it || it.categoriaId!==cat) return false;
+        }
+        if(fornId && r.fornecedorId!==fornId) return false;
+        if(itemId && r.itemId!==itemId) return false;
+        return true;
+      });
+    };
+
+    const atualizar = ()=>{
+      const ent = aplicarFiltros(entradas);
+      const sai = aplicarFiltros(saidas);
+
+      const valEnt = ent.reduce((s,r)=>s+(r.quantidade||0)*(r.custoUnit||0),0);
+      const valSai = sai.reduce((s,r)=>s+(r.quantidade||0)*(r.custoUnit||0),0);
+
+      // Agregações para gráficos
+      const porTipoEnt = {};
+      ent.forEach(r=>{ porTipoEnt[r.tipo] = (porTipoEnt[r.tipo]||0) + (r.quantidade||0)*(r.custoUnit||0); });
+      
+      const porTipoSai = {};
+      sai.forEach(r=>{ porTipoSai[r.tipo] = (porTipoSai[r.tipo]||0) + (r.quantidade||0)*(r.custoUnit||0); });
+
+      const catEnt = {}, catSai = {};
+      ent.forEach(r => {
+        const catId = itemMap[r.itemId]?.categoriaId || 'Sem Categoria';
+        catEnt[catId] = (catEnt[catId] || 0) + (r.quantidade||0)*(r.custoUnit||0);
+      });
+      sai.forEach(r => {
+        const catId = itemMap[r.itemId]?.categoriaId || 'Sem Categoria';
+        catSai[catId] = (catSai[catId] || 0) + (r.quantidade||0)*(r.custoUnit||0);
+      });
+      const allCats = [...new Set([...Object.keys(catEnt), ...Object.keys(catSai)])];
+      const catLabels = allCats.map(id => catMap[id] || 'Sem Categoria');
+      const catValuesEnt = allCats.map(id => catEnt[id] || 0);
+      const catValuesSai = allCats.map(id => catSai[id] || 0);
+
+      const setorConsumo = {};
+      sai.forEach(r => {
+        const setorId = r.setorId || 'Sem Setor';
+        setorConsumo[setorId] = (setorConsumo[setorId] || 0) + (r.quantidade||0)*(r.custoUnit||0);
+      });
+      const setorLabels = Object.keys(setorConsumo).map(id => depMap[id] || 'Sem Setor');
+      const setorValues = Object.keys(setorConsumo).map(id => setorConsumo[id]);
+
+      const qtdCompras = ent.filter(r=>r.tipo==='Compra').length;
+      const qtdSaidas = sai.length;
+
+      const itemIdSel = fItem.value;
+      const qtdComprada = itemIdSel ? ent.reduce((s,r)=>s+(r.quantidade||0),0) : null;
+
+      document.getElementById('kpis').innerHTML = `
+        <div class="kpi-card"><div class="kpi-label">Valor total entradas</div><div class="kpi-value">${Utils.brl(valEnt)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Valor total saídas</div><div class="kpi-value">${Utils.brl(valSai)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Qtd. compras</div><div class="kpi-value">${qtdCompras}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Qtd. saídas</div><div class="kpi-value">${qtdSaidas}</div></div>
+        ${qtdComprada!=null ? `<div class="kpi-card"><div class="kpi-label">Qtd. comprada (item)</div><div class="kpi-value">${Utils.num(qtdComprada,3)}</div></div>` : ''}
+      `;
+
+      const charts = document.getElementById('charts');
+      charts.innerHTML = '';
+
+      // 1. Entradas x Saídas (R$) - Rosca (Vermelho / Verde)
+      charts.appendChild(Chart.donut('Entradas x Saídas (R$)',[
+        {label:'Entradas',value:valEnt,color:'#ef4444'},
+        {label:'Saídas',value:valSai,color:'#22c55e'}
+      ],v=>Utils.brl(v)));
+
+      // 2. Custo total de saída por tipo (R$) - Barras Horizontais (Verde)
+      const saiTiposLabels = Object.keys(porTipoSai);
+      const saiTiposValues = saiTiposLabels.map(k => porTipoSai[k]);
+      if(saiTiposLabels.length > 0) {
+        charts.appendChild(Chart.hBar('Custo total de saída por tipo (R$)', saiTiposLabels, saiTiposValues, v=>Utils.brl(v), '#22c55e'));
+      }
+
+      // 3. Entradas por tipo (R$) - Barras Horizontais (Vermelho)
+      const entTiposLabels = Object.keys(porTipoEnt);
+      const entTiposValues = entTiposLabels.map(k => porTipoEnt[k]);
+      if(entTiposLabels.length > 0) {
+        charts.appendChild(Chart.hBar('Entradas por tipo (R$)', entTiposLabels, entTiposValues, v=>Utils.brl(v), '#ef4444'));
+      }
+
+      // 4. Categorias: Entrada vs Saída - Barras Verticais Agrupadas
+      charts.appendChild(Chart.groupedBar('Entradas e saídas por categoria (R$)', catLabels, catValuesEnt, catValuesSai, v=>Utils.brl(v), '#ef4444', '#22c55e'));
+
+      // 5. Consumo por Setor - Barras Verticais (Laranja)
+      if(setorLabels.length > 0) {
+        charts.appendChild(Chart.bar('Consumo por Setor (R$)', setorLabels, setorValues, v=>Utils.brl(v), '#f5a623'));
+      }
+
+      // Gráficos de linha condicionais ao item
+      if(itemIdSel){
+        const meses = [];
+        for(let i=11;i>=0;i--){
+          const d = new Date(ano,mes-1-i,1);
+          meses.push({mes:d.getMonth()+1,ano:d.getFullYear(),label:`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getFullYear()).slice(2)}`});
+        }
+        const valSerie = meses.map(m=>{
+          const total = entradas.filter(r=>{
+            if(r.itemId!==itemIdSel) return false;
+            const d = new Date(r.data+'T00:00:00');
+            return d.getMonth()+1===m.mes && d.getFullYear()===m.ano;
+          }).reduce((s,r)=>s+(r.quantidade||0)*(r.custoUnit||0),0);
+          return total;
+        });
+        charts.appendChild(Chart.line('Entradas em valor (últimos 12 meses)',meses.map(m=>m.label),valSerie,v=>Utils.brl(v)));
+
+        const qtdSerie = meses.map(m=>{
+          const total = entradas.filter(r=>{
+            if(r.itemId!==itemIdSel) return false;
+            const d = new Date(r.data+'T00:00:00');
+            return d.getMonth()+1===m.mes && d.getFullYear()===m.ano;
+          }).reduce((s,r)=>s+(r.quantidade||0),0);
+          return total;
+        });
+        charts.appendChild(Chart.line('Entradas em quantidade (últimos 12 meses)',meses.map(m=>m.label),qtdSerie,v=>Utils.num(v,2)));
+      }
+    };
+
+    [fMes,fAno,fTipo,fCat,fForn,fItem].forEach(el=>el.addEventListener('change',atualizar));
+    atualizar();
+  }
+};
+
+/* =========================================================
+   GRÁFICOS (SVG puro)
+   ========================================================= */
+const Chart = {
+  donut(title,data,fmt){
+    const card = document.createElement('div');
+    card.className = 'chart-card';
+    const total = data.reduce((s,d)=>s+d.value,0);
+    const size = 220, cx = 110, cy = 110, r = 80, rInner = 50;
+    let ang = -Math.PI/2;
+    let paths = '';
+    if(total===0){
+      paths = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#eef0f3" stroke-width="${r-rInner}"/>`;
+    }else{
+      data.forEach(d=>{
+        if(d.value<=0) return;
+        const frac = d.value/total;
+        const ang2 = ang + frac*Math.PI*2;
+        const large = frac>0.5?1:0;
+        const x1 = cx + r*Math.cos(ang), y1 = cy + r*Math.sin(ang);
+        const x2 = cx + r*Math.cos(ang2), y2 = cy + r*Math.sin(ang2);
+        const x3 = cx + rInner*Math.cos(ang2), y3 = cy + rInner*Math.sin(ang2);
+        const x4 = cx + rInner*Math.cos(ang), y4 = cy + rInner*Math.sin(ang);
+        paths += `<path d="M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} L ${x3} ${y3} A ${rInner} ${rInner} 0 ${large} 0 ${x4} ${y4} Z" fill="${d.color}"/>`;
+        ang = ang2;
+      });
+    }
+    card.innerHTML = `
+      <h4>${title}</h4>
+      <div class="chart-container">
+        <svg viewBox="0 0 ${size} ${size}">${paths}</svg>
+      </div>
+      <div class="legend" style="font-size: 12px">
+        ${data.map(d=>`<div class="legend-item"><span class="legend-dot" style="background:${d.color}"></span>${d.label}: ${fmt(d.value)}</div>`).join('')}
+      </div>
+    `;
+    return card;
+  },
+  hBar(title, labels, values, fmt, color){
+    const card = document.createElement('div');
+    card.className = 'chart-card';
+    const n = labels.length;
+    const H = Math.max(200, n * 45 + 60);
+    const W = 500;
+    const pad = {l: 140, r: 80, t: 20, b: 30};
+    const w = W - pad.l - pad.r;
+    const h = H - pad.t - pad.b;
+    const max = Math.max(...values, 0.0001);
+    const bh = (h / n) * 0.7;
+    const gap = (h / n) * 0.3;
+
+    let bars = '', yLabels = '', xTicks = '';
+    for(let i=0; i<n; i++) {
+      const bw = (values[i] / max) * w;
+      const y = pad.t + i * (bh + gap) + gap/2;
+      bars += `<rect x="${pad.l}" y="${y}" width="${bw}" height="${bh}" fill="${color}" rx="2"/>`;
+      
+      const words = String(labels[i]).split(' ');
+      let lines = [];
+      let currentLine = words[0] || '';
+      for(let j=1; j<words.length; j++){
+        if((currentLine + ' ' + words[j]).length > 15) {
+          lines.push(currentLine);
+          currentLine = words[j];
+        } else {
+          currentLine += ' ' + words[j];
+        }
+      }
+      lines.push(currentLine);
+      
+      const tspans = lines.map((line, idx) => {
+        const totalHeight = lines.length * 14;
+        const startY = y + bh/2 - (totalHeight / 2) + 4;
+        return `<tspan x="${pad.l - 10}" y="${startY + idx * 14}" text-anchor="end" font-size="11" fill="#374151">${line}</tspan>`;
+      }).join('');
+      yLabels += `<text>${tspans}</text>`;
+    }
+    for(let i=0; i<=4; i++) {
+      const v = max * i / 4;
+      const x = pad.l + (v / max) * w;
+      xTicks += `<line x1="${x}" y1="${pad.t}" x2="${x}" y2="${pad.t+h}" stroke="#eef0f3"/>`;
+      xTicks += `<text x="${x}" y="${H - 10}" text-anchor="middle" font-size="11" fill="#6b7280">${fmt(v)}</text>`;
+    }
+
+    card.innerHTML = `<h4>${title}</h4><div class="chart-container" style="min-height: ${H}px"><svg viewBox="0 0 ${W} ${H}">${xTicks}${bars}${yLabels}</svg></div>`;
+    return card;
+  },
+  groupedBar(title, labels, values1, values2, fmt, color1, color2){
+    const card = document.createElement('div');
+    card.className = 'chart-card';
+    const W = 500, H = 280, pad = {l:50,r:16,t:16,b:60};
+    const w = W-pad.l-pad.r, h = H-pad.t-pad.b;
+    const max = Math.max(...values1, ...values2, 0.0001);
+    const n = labels.length;
+    const groupW = w/n;
+    const bw = groupW * 0.35;
+    const gap = groupW * 0.1;
+
+    let bars = '', xLabels = '';
+    for(let i=0; i<n; i++) {
+      const bh1 = (values1[i]/max)*h;
+      const bh2 = (values2[i]/max)*h;
+      const x = pad.l + i*groupW + gap;
+      
+      bars += `<rect x="${x}" y="${pad.t + h - bh1}" width="${bw}" height="${bh1}" fill="${color1}" rx="2"/>`;
+      bars += `<rect x="${x + bw + 2}" y="${pad.t + h - bh2}" width="${bw}" height="${bh2}" fill="${color2}" rx="2"/>`;
+      
+      if(i % Math.max(1, Math.floor(n/8)) === 0 || i === n-1) {
+        const cx = x + bw + 1;
+        const cy = H - pad.b + 15;
+        const words = String(labels[i]).split(' ');
+        let lines = [];
+        let currentLine = words[0] || '';
+        for(let j=1; j<words.length; j++){
+          if((currentLine + ' ' + words[j]).length > 12) {
+            lines.push(currentLine);
+            currentLine = words[j];
+          } else {
+            currentLine += ' ' + words[j];
+          }
+        }
+        lines.push(currentLine);
+        const tspans = lines.map((line, idx) => 
+          `<tspan x="${cx}" y="${cy + idx * 14}" text-anchor="middle" font-size="11" fill="#6b7280">${line}</tspan>`
+        ).join('');
+        xLabels += `<text>${tspans}</text>`;
+      }
+    }
+    let yTicks = '';
+    for(let i=0;i<=4;i++){
+      const v = max*i/4;
+      const y = pad.t + h - (v/max)*h;
+      yTicks += `<line x1="${pad.l}" y1="${y}" x2="${pad.l+w}" y2="${y}" stroke="#eef0f3"/>`;
+      yTicks += `<text x="${pad.l-8}" y="${y+4}" text-anchor="end" font-size="11" fill="#6b7280">${fmt(v)}</text>`;
+    }
+
+    card.innerHTML = `
+      <h4>${title}</h4>
+      <div class="chart-container" style="min-height: ${H}px">
+        <svg viewBox="0 0 ${W} ${H}">
+          ${yTicks}
+          <line x1="${pad.l}" y1="${pad.t+h}" x2="${pad.l+w}" y2="${pad.t+h}" stroke="#c4cad4"/>
+          <line x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${pad.t+h}" stroke="#c4cad4"/>
+          ${xLabels}
+          ${bars}
+        </svg>
+      </div>
+      <div class="legend" style="font-size: 12px">
+        <div class="legend-item"><span class="legend-dot" style="background:${color1}"></span>Entradas</div>
+        <div class="legend-item"><span class="legend-dot" style="background:${color2}"></span>Saídas</div>
+      </div>
+    `;
+    return card;
+  },
+  line(title,labels,values,fmt){
+    const card = document.createElement('div');
+    card.className = 'chart-card';
+    const W = 500, H = 280, pad = {l:60,r:16,t:16,b:60};
+    const w = W-pad.l-pad.r, h = H-pad.t-pad.b;
+    const max = Math.max(...values,0.0001);
+    const min = 0;
+    const n = values.length;
+    const step = n>1?w/(n-1):0;
+    const pts = values.map((v,i)=>({
+      x: pad.l + i*step,
+      y: pad.t + h - (v-min)/(max-min||1)*h
+    }));
+    const path = pts.map((p,i)=>(i===0?'M':'L')+p.x+','+p.y).join(' ');
+    const area = path + ` L ${pts[pts.length-1].x},${pad.t+h} L ${pts[0].x},${pad.t+h} Z`;
+    let yTicks = '';
+    for(let i=0;i<=4;i++){
+      const v = min + (max-min)*i/4;
+      const y = pad.t + h - (v-min)/(max-min||1)*h;
+      yTicks += `<line x1="${pad.l}" y1="${y}" x2="${pad.l+w}" y2="${y}" stroke="#eef0f3"/>`;
+      yTicks += `<text x="${pad.l-8}" y="${y+4}" text-anchor="end" font-size="11" fill="#6b7280">${fmt(v)}</text>`;
+    }
+    const stepLabel = Math.max(1,Math.floor(n/6));
+    let xLabels = '';
+    labels.forEach((l,i)=>{
+      if(i%stepLabel!==0 && i!==n-1) return;
+      const x = pad.l + i*step;
+      const y = H - pad.b + 15;
+      const words = String(l).split(' ');
+      let lines = [];
+      let currentLine = words[0] || '';
+      for(let j=1; j<words.length; j++){
+        if((currentLine + ' ' + words[j]).length > 12) {
+          lines.push(currentLine);
+          currentLine = words[j];
+        } else {
+          currentLine += ' ' + words[j];
+        }
+      }
+      lines.push(currentLine);
+      const tspans = lines.map((line, idx) => 
+        `<tspan x="${x}" y="${y + idx * 14}" text-anchor="middle" font-size="11" fill="#6b7280">${line}</tspan>`
+      ).join('');
+      xLabels += `<text>${tspans}</text>`;
+    });
+    card.innerHTML = `
+      <h4>${title}</h4>
+      <div class="chart-container" style="min-height: ${H}px">
+        <svg viewBox="0 0 ${W} ${H}">
+          ${yTicks}
+          <line x1="${pad.l}" y1="${pad.t+h}" x2="${pad.l+w}" y2="${pad.t+h}" stroke="#c4cad4"/>
+          <line x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${pad.t+h}" stroke="#c4cad4"/>
+          ${xLabels}
+          <path d="${area}" fill="#1e4a8f" opacity="0.12"/>
+          <path d="${path}" fill="none" stroke="#1e4a8f" stroke-width="2"/>
+          ${pts.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="3" fill="#1e4a8f"/>`).join('')}
+        </svg>
+      </div>
+    `;
+    return card;
+  },
+  bar(title,labels,values,fmt,color='#1e4a8f'){
+    const card = document.createElement('div');
+    card.className = 'chart-card';
+    const W = 500, H = 280, pad = {l:50,r:16,t:16,b:60};
+    const w = W-pad.l-pad.r, h = H-pad.t-pad.b;
+    const max = Math.max(...values,0.0001);
+    const n = values.length;
+    const bw = w/n*0.7;
+    const gap = w/n*0.3;
+    let bars = '';
+    values.forEach((v,i)=>{
+      const bh = (v/max)*h;
+      const x = pad.l + i*(bw+gap) + gap/2;
+      const y = pad.t + h - bh;
+      bars += `<rect x="${x}" y="${y}" width="${bw}" height="${bh}" fill="${color}" rx="2"/>`;
+    });
+    let yTicks = '';
+    for(let i=0;i<=4;i++){
+      const v = max*i/4;
+      const y = pad.t + h - (v/max)*h;
+      yTicks += `<line x1="${pad.l}" y1="${y}" x2="${pad.l+w}" y2="${y}" stroke="#eef0f3"/>`;
+      yTicks += `<text x="${pad.l-8}" y="${y+4}" text-anchor="end" font-size="11" fill="#6b7280">${fmt(v)}</text>`;
+    }
+    const stepLabel = Math.max(1,Math.floor(n/8));
+    let xLabels = '';
+    labels.forEach((l,i)=>{
+      if(i%stepLabel!==0 && i!==n-1) return;
+      const x = pad.l + i*(bw+gap) + gap/2 + bw/2;
+      const y = H - pad.b + 15;
+      const words = String(l).split(' ');
+      let lines = [];
+      let currentLine = words[0] || '';
+      for(let j=1; j<words.length; j++){
+        if((currentLine + ' ' + words[j]).length > 12) {
+          lines.push(currentLine);
+          currentLine = words[j];
+        } else {
+          currentLine += ' ' + words[j];
+        }
+      }
+      lines.push(currentLine);
+      const tspans = lines.map((line, idx) => 
+        `<tspan x="${x}" y="${y + idx * 14}" text-anchor="middle" font-size="11" fill="#6b7280">${line}</tspan>`
+      ).join('');
+      xLabels += `<text>${tspans}</text>`;
+    });
+    card.innerHTML = `
+      <h4>${title}</h4>
+      <div class="chart-container" style="min-height: ${H}px">
+        <svg viewBox="0 0 ${W} ${H}">
+          ${yTicks}
+          <line x1="${pad.l}" y1="${pad.t+h}" x2="${pad.l+w}" y2="${pad.t+h}" stroke="#c4cad4"/>
+          <line x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${pad.t+h}" stroke="#c4cad4"/>
+          ${xLabels}
+          ${bars}
+        </svg>
+      </div>
+    `;
+    return card;
+  }
+};
+
+/* =========================================================
+   LOGIN LOGIC
+   ========================================================= */
+const loginFormEl = document.getElementById('loginForm');
+const loginPassEl = document.getElementById('loginPass');
+const togglePasswordEl = document.getElementById('togglePassword');
+const eyeIconEl = document.getElementById('eyeIcon');
+const eyeOffIconEl = document.getElementById('eyeOffIcon');
+const loginErrorEl = document.getElementById('loginError');
+const btnForgotPasswordEl = document.getElementById('btnForgotPassword');
+
+if (loginFormEl) {
+  loginFormEl.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const user = document.getElementById('loginUser').value.trim();
+    const pass = loginPassEl.value;
+    
+    if (App.login(user, pass)) {
+      loginErrorEl.style.display = 'none';
+    } else {
+      loginErrorEl.style.display = 'block';
+      loginPassEl.value = '';
+      loginPassEl.focus();
+    }
+  });
+}
+
+if (togglePasswordEl) {
+  togglePasswordEl.addEventListener('click', () => {
+    const type = loginPassEl.getAttribute('type') === 'password' ? 'text' : 'password';
+    loginPassEl.setAttribute('type', type);
+    if (type === 'text') {
+      eyeIconEl.style.display = 'none';
+      eyeOffIconEl.style.display = 'block';
+    } else {
+      eyeIconEl.style.display = 'block';
+      eyeOffIconEl.style.display = 'none';
+    }
+  });
+}
+
+if (btnForgotPasswordEl) {
+  btnForgotPasswordEl.addEventListener('click', (e) => {
+    e.preventDefault();
+    Modal.open('Recuperação de Senha', 
+      '<p>Por favor, contate o suporte através do WhatsApp:</p><p style="font-size:1.2rem;font-weight:600;color:var(--verde);margin-top:8px;">(11) 91002-1244</p>',
+      `<button class="btn btn-primary" onclick="Modal.close()">OK</button>`
+    );
+  });
+}
+
+/* =========================================================
+   INICIALIZAÇÃO
+   ========================================================= */
+App.init().catch(err=>{
+  console.error(err);
+  Toast.error('Erro ao inicializar o sistema.');
+});
+</script>
+</body>
+</html>
